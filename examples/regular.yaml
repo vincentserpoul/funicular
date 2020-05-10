@@ -1,0 +1,48 @@
+base:
+  hostname: myhost
+  alpine:
+    mirror: "http://dl-cdn.alpinelinux.org/alpine"
+    version: 3.11.6
+    timezone: Asia/Singapore
+  networking:
+    dns_nameservers:
+      - 8.8.8.8
+      - 1.1.1.1
+    ethernet:
+      enabled: true
+    wifi:
+      enabled: true
+      ssid: home
+      passphrase: mypassword
+  ssh:
+    authorized_keys:
+      - ssh-ed25519 AADDADAWsfddsfasADeraAFFDfdsFSDFDSFstdtsdFFSDfsdf t@polochaon
+    2fa:
+      enabled: true
+      code: 2SDXR4SYT3QNTYH7HTPPRRPSI
+  users:
+    root_password: rootpass
+    remote_user: funi
+    remote_user_password: funipass
+  write_files:
+    - content: x
+      owner: "root:root"
+      path: /etc/fstab
+      permissions: "0644"
+    - content: x
+      owner: "root:root"
+      path: /udev/rules.d
+      permissions: "0644"
+
+k3s:
+  token: TOKEN_VALUE
+  k3s_args:
+    - server
+    - "--disable-agent"
+  taints:
+    - "key1=value1:NoSchedule"
+    - "key1=value1:NoExecute"
+  labels:
+    somekey: somevalue
+  environment:
+    http_proxy: "http://myserver"

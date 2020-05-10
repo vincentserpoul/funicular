@@ -1,0 +1,64 @@
+[base]
+hostname = "myhost"
+
+  [base.alpine]
+  mirror = "http://dl-cdn.alpinelinux.org/alpine"
+  branch = "latest-stable"
+  version = "3.11.6"
+  timezone = "Asia/Singapore"
+
+  [base.networking]
+  dns_nameservers = [
+    "8.8.8.8",
+    "1.1.1.1"
+  ]
+
+    [base.networking.ethernet]
+    enabled = true
+
+    [base.networking.wifi]
+    enabled = true
+    ssid = "home"
+    passphrase = "mypassword"
+
+  [base.ssh]
+  authorized_keys = [
+    "ssh-ed25519 AADDADAWsfddsfasADeraAFFDfdsFSDFDSFstdtsdFFSDfsdf t@polochaon"
+  ]
+
+    [base.ssh.2fa]
+    enabled = true
+    code = "2SDXR4SYT3QNTYH7HTPPRRPSI"
+
+  [base.users]
+  root_password = "rootpass"
+  funi_password = "funipass"
+
+  [[base.write_files]]
+  content = "x"
+  owner = "root:root"
+  path = "/etc/fstab"
+  permissions = "0644"
+
+  [[base.write_files]]
+  content = "x"
+  owner = "root:root"
+  path = "/udev/rules.d"
+  permissions = "0644"
+
+[k3s]
+token = "TOKEN_VALUE"
+k3s_args = [
+  "server",
+  "--disable-agent"
+]
+taints = [
+  "key1=value1:NoSchedule",
+  "key1=value1:NoExecute"
+]
+
+  [k3s.labels]
+  somekey = "somevalue"
+
+  [k3s.environment]
+  http_proxy = "http://myserver"
