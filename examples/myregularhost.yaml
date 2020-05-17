@@ -1,5 +1,5 @@
 base:
-  hostname: myhost
+  hostname: "regularhost"
   alpine:
     mirror: "http://dl-cdn.alpinelinux.org/alpine"
     version: 3.11.6
@@ -16,8 +16,9 @@ base:
       passphrase: mypassword
   ssh:
     authorized_keys:
-      - ssh-ed25519 AADDADAWsfddsfasADeraAFFDfdsFSDFDSFstdtsdFFSDfsdf t@polochaon
-    2fa:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMIVp6q5co/r5GwY0dH+NYQbfKicapeF3gXEU3dzaAvD me@home
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCiChinH9volauTvLfGWv2xCIo0jrQAv0jCQjfDodZW+E1vLFUcgdULKemujxG2vLzLUHfSHF9mjnwnGbyHYZi1fEO70s3gGZNd9K2xwvkGo28svefCfNR3hi+jSB9Q9drvR7CgYdEY5D90Z/OfSWJ4a60/qpD7L3uXf5riqYddDUbHVlDg11SK27KHan33UAfskd5u2AccRbXKJX3I6oO78AwI4/fHs2N/RuoleYcsHX9FNaVX8NHxSEY7EXLTPmykRQj8/8ubjuflvm4qYTsW8cFtRETfxkgFMF0p375YEVQles/6JwRsljnVaobiyeNG1u/5p4zaEguuqN7oVpsP me@home
+    two_factor_auth:
       enabled: true
       code: 2SDXR4SYT3QNTYH7HTPPRRPSI
   users:
