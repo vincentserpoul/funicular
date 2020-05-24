@@ -20,12 +20,11 @@ impl Default for APKOverlay {
                     timezone: "Asia/Singapore".parse().unwrap(),
                 },
                 networking: Networking {
-                    ethernet: Ethernet { enabled: true },
-                    wifi: Wifi {
-                        enabled: false,
+                    ethernet: Some(Ethernet { enabled: true }),
+                    wlan: Some(WLAN {
                         ssid: String::from(""),
                         passphrase: String::from(""),
-                    },
+                    }),
                     dns_nameservers: vec![
                         IpAddr::V4(Ipv4Addr::new(1, 1, 1, 1)),
                         IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
@@ -33,10 +32,9 @@ impl Default for APKOverlay {
                 },
                 ssh: SSH {
                     authorized_keys: Vec::new(),
-                    two_factor_auth: TwoFactorAuth {
-                        enabled: true,
+                    two_factor_auth: Some(TwoFactorAuth {
                         code: String::from(""),
-                    },
+                    }),
                 },
                 users: Users {
                     root_password: String::from(""),
@@ -97,8 +95,8 @@ pub struct Alpine {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Networking {
-    ethernet: Ethernet,
-    wifi: Wifi,
+    ethernet: Option<Ethernet>,
+    wlan: Option<WLAN>,
     dns_nameservers: Vec<std::net::IpAddr>,
 }
 
@@ -108,8 +106,7 @@ pub struct Ethernet {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Wifi {
-    enabled: bool,
+pub struct WLAN {
     ssid: String,
     passphrase: String,
 }
@@ -117,12 +114,11 @@ pub struct Wifi {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SSH {
     authorized_keys: Vec<PublicKey>,
-    two_factor_auth: TwoFactorAuth,
+    two_factor_auth: Option<TwoFactorAuth>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TwoFactorAuth {
-    enabled: bool,
     code: String,
 }
 

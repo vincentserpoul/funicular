@@ -8,8 +8,6 @@ base:
     dns_nameservers:
       - 8.8.8.8
       - 1.1.1.1
-    ethernet:
-      enabled: true
     wlan:
       ssid: home
       passphrase: mypassword
