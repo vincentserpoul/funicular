@@ -1,5 +1,5 @@
 base:
-  hostname: "regularhost"
+  hostname: "alloptions_noprovisioner"
   alpine:
     mirror: "http://dl-cdn.alpinelinux.org/alpine"
     version: 3.11.6
@@ -23,22 +23,3 @@ base:
     root_password: rootpass
     remote_user: funi
     remote_user_password: funipass
-  write_files:
-    - content: x
-      owner: "root:root"
-      path: /etc/fstab
-      permissions: "0644"
-    - content: x
-      owner: "root:root"
-      path: /udev/rules.d
-      permissions: "0644"
-
-provisioners:
-  - name: k3s
-    scripts:
-      - ./scripts/local/provisioners/k3s.sh
-    environment_vars:
-      TOKEN_VALUE: "12334ef"
-      K3S_ARGS: "server --disable-agent"
-      TAINTS: "key1=value1:NoSchedule key1=value1:NoExecute"
-      LABELS: "somekey:somevalue someotherkey:someothervalue"
