@@ -33,15 +33,12 @@ base:
       path: /udev/rules.d
       permissions: "0644"
 
-k3s:
-  token: TOKEN_VALUE
-  k3s_args:
-    - server
-    - "--disable-agent"
-  taints:
-    - "key1=value1:NoSchedule"
-    - "key1=value1:NoExecute"
-  labels:
-    somekey: somevalue
-  environment:
-    http_proxy: "http://myserver"
+provisioners:
+  - name: k3s
+    scripts:
+      - ./scripts/local/provisioners/k3s.sh
+    environment_vars:
+      - TOKEN_VALUE: 12334ef
+        K3S_ARGS: "server --disable-agent"
+        TAINTS: "key1=value1:NoSchedule key1=value1:NoExecute"
+        LABELS: "somekey:somevalue someotherkey:someothervalue"
