@@ -1,3 +1,11 @@
+#![warn(
+    clippy::all,
+    clippy::restriction,
+    clippy::pedantic,
+    clippy::nursery,
+    clippy::cargo
+)]
+
 pub mod apk_overlay;
 
 use anyhow::Result;

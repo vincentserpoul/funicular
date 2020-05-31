@@ -1,8 +1,8 @@
 base:
-  hostname: "nooption_k3sprovisioner"
+  hostname: "with_provisioners"
   alpine:
     mirror: "http://dl-cdn.alpinelinux.org/alpine"
-    version: 3.11.6
+    version: 3.12.0
     timezone: Asia/Singapore
   networking:
     dns_nameservers:
@@ -18,6 +18,20 @@ base:
     remote_user_password: funipass
 
 provisioners:
+  - name: wlan
+    scripts:
+      - ./scripts/provisioners/wlan.sh
+    environment_vars:
+      SSID: "wifi"
+      PASSWORD: "passwifi"
+  - name: two_factor_auth
+    scripts:
+      - ./scripts/provisioners/two_factor_auth.sh
+    environment_vars:
+      CODE: "ADCGGDI"
+    lbu_additions:
+      - /var/test
+      - /usr/testa
   - name: k3s
     scripts:
       - ./scripts/local/provisioners/k3s.sh
