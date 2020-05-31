@@ -20,19 +20,16 @@ base:
 
 provisioners:
   - name: wlan
-    scripts:
-      - ./scripts/provisioners/wlan.sh
+    script_path: ./scripts/provisioners/wlan.sh
     environment_vars:
       SSID: "wifi"
       PASSWORD: "passwifi"
   - name: two_factor_auth
-    scripts:
-      - ./scripts/provisioners/two_factor_auth.sh
+    script_path: ./scripts/provisioners/two_factor_auth.sh
     environment_vars:
       CODE: "ADCGGDI"
   - name: k3s
-    scripts:
-      - ./scripts/provisioners/k3s.sh
+    script_path: ./scripts/provisioners/k3s.sh
     environment_vars:
       TOKEN_VALUE: "12334ef"
       K3S_ARGS: "server --disable-agent"

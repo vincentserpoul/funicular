@@ -33,8 +33,7 @@ provisioners:
       - /var/test
       - /usr/testa
   - name: k3s
-    scripts:
-      - ./scripts/local/provisioners/k3s.sh
+    script_path: ./scripts/local/provisioners/k3s.sh
     environment_vars:
       TOKEN_VALUE: "12334ef"
       K3S_ARGS: "server --disable-agent"
