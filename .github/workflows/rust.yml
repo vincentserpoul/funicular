@@ -25,9 +25,10 @@ jobs:
     - name: rust-tarpaulin
       uses: actions-rs/tarpaulin@v0.1.0
       with:
-        out: ./coverage/lcov.info
+        args: "-- --out Lcov"
      
     - name: Coveralls GitHub Action
       uses: coverallsapp/github-action@v1.1.1
       with:
         github-token: ${{secrets.COVERALLS_TOKEN}}
+        path-to-lcov: ./lcov.info 
