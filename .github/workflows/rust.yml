@@ -26,6 +26,7 @@ jobs:
       uses: actions-rs/tarpaulin@v0.1.0
       with:
         out-type: Lcov
+        args: "--out Lcov"
      
     - name: Coveralls GitHub Action
       uses: coverallsapp/github-action@v1.1.1
