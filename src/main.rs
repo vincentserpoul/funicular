@@ -12,7 +12,7 @@ use anyhow::Result;
 use apk_overlay::APKOverlay;
 
 fn main() -> Result<(), anyhow::Error> {
-    let overlay = APKOverlay::from_path("./examples/myregularhost.yaml");
+    let overlay = APKOverlay::from_path("./out/exmaple/config.yaml");
     dbg!(&overlay);
     Ok(())
 }

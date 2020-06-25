@@ -19,23 +19,21 @@ base:
 
 provisioners:
   - name: wlan
-    scripts:
-      - ./scripts/provisioners/wlan.sh
+    script_path: "./scripts/provisioners/wlan.sh"
     environment_vars:
-      SSID: "wifi"
-      PASSWORD: "passwifi"
+      ssid: "wifi"
+      password: "passwifi"
   - name: two_factor_auth
-    scripts:
-      - ./scripts/provisioners/two_factor_auth.sh
+    script_path: "./scripts/provisioners/two_factor_auth.sh"
     environment_vars:
-      CODE: "ADCGGDI"
+      code: "ADCGGDI"
     lbu_additions:
       - /var/test
       - /usr/testa
   - name: k3s
-    script_path: ./scripts/local/provisioners/k3s.sh
+    script_path: "./scripts/local/provisioners/k3s.sh"
     environment_vars:
-      TOKEN_VALUE: "12334ef"
-      K3S_ARGS: "server --disable-agent"
-      TAINTS: "key1=value1:NoSchedule key1=value1:NoExecute"
-      LABELS: "somekey:somevalue someotherkey:someothervalue"
+      token_value: "12334ef"
+      k3s_args: "server --disable-agent"
+      taints: "key1=value1:NoSchedule key1=value1:NoExecute"
+      labels: "somekey:somevalue someotherkey:someothervalue"

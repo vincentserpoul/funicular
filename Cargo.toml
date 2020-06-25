@@ -8,8 +8,6 @@ edition = "2018"
 serde = "1.0"
 serde_yaml = "0.8"
 semver = { version = "0.10.0", features = ["serde"] }
-chrono = "0.4"
-chrono-tz = { version = "0.5", features = ["serde"] }
 sshkeys = { version = "0.3", features = ["serde"] }
 serde_derive = "1.0"
 thiserror = "1"

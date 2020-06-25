@@ -1,14 +1,23 @@
 pub mod base;
+pub mod env_vars;
 pub mod provisioner;
 
 use anyhow;
 use base::Base;
+use env_vars::EnvVars;
 use provisioner::Provisioner;
 use serde_derive::{Deserialize, Serialize};
 use serde_yaml;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::path::Path;
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct APKOverlay {
+    pub base: Base,
+    pub provisioners: Option<Vec<Provisioner>>,
+}
 
 impl Default for APKOverlay {
     fn default() -> APKOverlay {
@@ -24,19 +33,53 @@ impl APKOverlay {
         APKOverlay::default()
     }
 
-    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<APKOverlay, anyhow::Error> {
+    pub fn from_path<P: AsRef<Path>>(
+        path: P,
+    ) -> Result<APKOverlay, anyhow::Error> {
         let f = File::open(path)?;
         APKOverlay::from_reader(f)
     }
 
-    pub fn from_reader<R: io::Read>(rdr: R) -> Result<APKOverlay, anyhow::Error> {
+    pub fn from_reader<R: io::Read>(
+        rdr: R,
+    ) -> Result<APKOverlay, anyhow::Error> {
         let ao: APKOverlay = serde_yaml::from_reader(rdr)?;
         Ok(ao)
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct APKOverlay {
-    pub base: Base,
-    pub provisioners: Option<Vec<Provisioner>>,
+impl EnvVars for APKOverlay {
+    fn to_hash_map(&self, _existing_key: &str) -> HashMap<String, String> {
+        let mut hm: HashMap<String, String> = HashMap::new();
+        hm.extend::<HashMap<String, String>>(self.base.to_hash_map(""));
+
+        if let Some(provisioners) = &self.provisioners {
+            let mut ps: Vec<&str> = Vec::new();
+            provisioners.iter().for_each(|p| {
+                // provisioners'list
+                ps.push(p.name.as_str());
+                // provisioner
+                hm.extend::<HashMap<String, String>>(
+                    p.environment_vars.to_hash_map(
+                        ("provisioner".to_uppercase()
+                            + "_"
+                            + p.name.to_uppercase().as_str())
+                        .as_str(),
+                    ),
+                );
+            });
+
+            // provisioners'list
+            if ps.len() > 0 {
+                hm.extend::<HashMap<String, String>>(
+                    [("provisioners".to_uppercase(), ps.join(" "))]
+                        .iter()
+                        .cloned()
+                        .collect(),
+                );
+            }
+        }
+
+        hm
+    }
 }

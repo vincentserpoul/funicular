@@ -1,12 +1,16 @@
+use super::env_vars::EnvVars;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 use thiserror::Error;
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct EnvironmentVars(pub HashMap<String, String>);
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Provisioner {
     pub name: String,
     pub script_path: String,
-    pub environment_vars: HashMap<String, String>,
+    pub environment_vars: EnvironmentVars,
     pub lbu_additions: Option<Vec<String>>,
 }
 
@@ -22,5 +26,19 @@ impl Provisioner {
     pub fn run_all_scripts(&self) -> Result<(), ProvisionerError> {
         println!("{:?}", self.script_path);
         Ok(())
+    }
+}
+
+impl EnvVars for EnvironmentVars {
+    fn to_hash_map(&self, existing_key: &str) -> HashMap<String, String> {
+        self.0
+            .iter()
+            .map(|(key, val)| {
+                (
+                    existing_key.to_owned() + "_" + key.to_uppercase().as_str(),
+                    val.to_owned(),
+                )
+            })
+            .collect()
     }
 }
