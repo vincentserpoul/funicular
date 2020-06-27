@@ -4,7 +4,7 @@ use funicular::apk_overlay::APKOverlay;
 #[test]
 fn alloptions_noprovisioner() {
     let overlay = APKOverlay::from_path(
-        "./tests/apk_overlay/configs/no_provisioner.yaml",
+        "./tests/apk_overlay/configs/no_provisioner.toml",
     )
     .unwrap();
     assert_eq!(overlay.base.hostname, String::from("no_provisioner"));
@@ -13,7 +13,7 @@ fn alloptions_noprovisioner() {
 #[test]
 fn with_provisioners() {
     let overlay = APKOverlay::from_path(
-        "./tests/apk_overlay/configs/with_provisioners.yaml",
+        "./tests/apk_overlay/configs/with_provisioners.toml",
     )
     .unwrap();
     assert_eq!(overlay.base.hostname, String::from("with_provisioners"));
@@ -29,11 +29,10 @@ fn with_provisioners() {
 #[test]
 fn provisioners_to_env_vars() {
     let overlay = APKOverlay::from_path(
-        "./tests/apk_overlay/configs/with_provisioners.yaml",
+        "./tests/apk_overlay/configs/with_provisioners.toml",
     )
     .unwrap();
     let env_vars = overlay.to_hash_map("");
-    println!("{:?}", env_vars);
     assert_eq!(
         env_vars.contains_key("PROVISIONER_TWO_FACTOR_AUTH_CODE"),
         true

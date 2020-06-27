@@ -1,11 +1,11 @@
 use super::env_vars::EnvVars;
 use semver::Version;
-use serde_derive::{Deserialize, Serialize};
+use serde_derive::Deserialize;
 use sshkeys::PublicKey;
 use std::collections::HashMap;
 use std::net::{IpAddr, Ipv4Addr};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct Base {
     pub hostname: String,
     pub alpine: Alpine,
@@ -46,7 +46,7 @@ impl EnvVars for Base {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct Alpine {
     pub mirror: String,
     pub version: Version,
@@ -85,7 +85,7 @@ impl EnvVars for Alpine {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct Networking {
     pub dns_nameservers: Vec<IpAddr>,
 }
@@ -121,7 +121,7 @@ impl EnvVars for Networking {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct SSH {
     pub authorized_keys: Vec<PublicKey>,
 }
@@ -146,7 +146,7 @@ impl EnvVars for SSH {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct Users {
     pub root_password: String,
     pub remote_user: String,

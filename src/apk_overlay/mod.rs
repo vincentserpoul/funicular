@@ -6,14 +6,13 @@ use anyhow;
 use base::Base;
 use env_vars::EnvVars;
 use provisioner::Provisioner;
-use serde_derive::{Deserialize, Serialize};
-use serde_yaml;
+use serde_derive::Deserialize;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::path::Path;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct APKOverlay {
     pub base: Base,
     pub provisioners: Option<Vec<Provisioner>>,
@@ -41,9 +40,15 @@ impl APKOverlay {
     }
 
     pub fn from_reader<R: io::Read>(
-        rdr: R,
+        mut rdr: R,
     ) -> Result<APKOverlay, anyhow::Error> {
-        let ao: APKOverlay = serde_yaml::from_reader(rdr)?;
+        let mut s = String::from("");
+        &rdr.read_to_string(&mut s)?;
+        APKOverlay::from_str(s.as_str())
+    }
+
+    pub fn from_str(s: &str) -> Result<APKOverlay, anyhow::Error> {
+        let ao: APKOverlay = toml::from_str(s)?;
         Ok(ao)
     }
 }
