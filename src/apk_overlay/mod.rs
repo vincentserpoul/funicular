@@ -51,10 +51,8 @@ impl APKOverlay {
         let ao: APKOverlay = toml::from_str(s)?;
         Ok(ao)
     }
-}
 
-impl EnvVars for APKOverlay {
-    fn to_hash_map(&self, _existing_key: &str) -> HashMap<String, String> {
+    pub fn to_hash_map(&self) -> HashMap<String, String> {
         let mut hm: HashMap<String, String> = HashMap::new();
         hm.extend::<HashMap<String, String>>(self.base.to_hash_map(""));
 
@@ -86,5 +84,12 @@ impl EnvVars for APKOverlay {
         }
 
         hm
+    }
+
+    pub fn to_string(&self) -> String {
+        self.to_hash_map()
+            .iter()
+            .map(|(k, v)| k.clone() + "=\"" + v + "\"\n")
+            .collect::<String>()
     }
 }
