@@ -1,9 +1,9 @@
-use funicular::apk_overlay::APKOverlay;
+use funicular::config::apk_overlay::APKOverlay;
 
 #[test]
 fn alloptions_noprovisioner() {
     let overlay = APKOverlay::from_path(
-        "./tests/apk_overlay/configs/no_provisioner.toml",
+        "./tests/config/apk_overlay/configs/no_provisioner.toml",
     )
     .unwrap();
     assert_eq!(overlay.base.hostname, String::from("no_provisioner"));
@@ -12,7 +12,7 @@ fn alloptions_noprovisioner() {
 #[test]
 fn with_provisioners() {
     let overlay = APKOverlay::from_path(
-        "./tests/apk_overlay/configs/with_provisioners.toml",
+        "./tests/config/apk_overlay/configs/with_provisioners.toml",
     )
     .unwrap();
     assert_eq!(overlay.base.hostname, String::from("with_provisioners"));
@@ -28,7 +28,7 @@ fn with_provisioners() {
 #[test]
 fn provisioners_to_env_vars() {
     let overlay = APKOverlay::from_path(
-        "./tests/apk_overlay/configs/with_provisioners.toml",
+        "./tests/config/apk_overlay/configs/with_provisioners.toml",
     )
     .unwrap();
     let env_vars = overlay.to_hash_map();
@@ -45,7 +45,7 @@ fn provisioners_to_env_vars() {
 #[test]
 fn provisioners_to_string() {
     let overlay = APKOverlay::from_path(
-        "./tests/apk_overlay/configs/no_provisioner.toml",
+        "./tests/config/apk_overlay/configs/no_provisioner.toml",
     )
     .unwrap();
     let overlay = overlay.to_string();

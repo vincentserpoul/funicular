@@ -5,7 +5,7 @@ use std::path::PathBuf;
 // Options accepted for the `build` command
 #[derive(Debug, Options)]
 pub struct BuildOpts {
-    #[options(help = "print help message")]
+    #[options(help = "build according to your config file")]
     help: bool,
 
     #[options(

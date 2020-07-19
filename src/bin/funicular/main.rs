@@ -1,8 +1,8 @@
-use funicular::commands::FunicularOptions;
+use funicular::commands::FunicularOpts;
 use gumdrop::Options;
 
 fn main() {
-    let opts = FunicularOptions::parse_args_default_or_exit();
+    let opts = FunicularOpts::parse_args_default_or_exit();
 
     println!("{:#?}", opts);
 }
