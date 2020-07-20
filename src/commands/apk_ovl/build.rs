@@ -5,8 +5,8 @@ use std::path::PathBuf;
 // Options accepted for the `build` command
 #[derive(Debug, Options)]
 pub struct BuildOpts {
-    #[options(help = "build according to your config file")]
-    help: bool,
+    #[options(help = "show this help message")]
+    pub help: bool,
 
     #[options(
         help = "target directory for your apkovl (usually same as your config file folder)"
@@ -17,11 +17,10 @@ pub struct BuildOpts {
     config_file: PathBuf,
 }
 
-pub fn build(
-    dir: Option<PathBuf>,
-    _config_file: PathBuf,
-) -> Result<(), anyhow::Error> {
-    let _output_dir = dir.unwrap_or(PathBuf::from("./out"));
-
-    Ok(())
+impl BuildOpts {
+    pub fn run(&self) -> Result<(), anyhow::Error> {
+        // let _output_dir = dir.unwrap_or(PathBuf::from("./out"));
+        println!("docker run");
+        Ok(())
+    }
 }

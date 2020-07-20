@@ -1,19 +1,43 @@
 pub mod apk_ovl;
+
+use anyhow;
 use apk_ovl::ApkOvlOpts;
 use gumdrop::Options;
 
 // Define options for the program.
 #[derive(Debug, Options)]
 pub struct FunicularOpts {
-    #[options(help = "print help message")]
-    help: bool,
+    #[options(help = "show this help message")]
+    pub help: bool,
 
     #[options(command)]
     command: Option<FunicularCommand>,
 }
 
-// Options accepted for the `build` command
+impl FunicularOpts {
+    pub fn run(&self) -> Result<(), anyhow::Error> {
+        match &self.command {
+            Some(FunicularCommand::ApkOvl(o)) => {
+                if o.help_requested() {
+                    println!("{}", ApkOvlOpts::usage());
+                    return Ok(());
+                }
+                return o.run();
+            }
+            None => {
+                println!("{}", FunicularOpts::self_usage(&self));
+                println!();
+                println!("Available commands:");
+                println!("{}", FunicularOpts::command_list().unwrap());
+                return Ok(());
+            }
+        }
+    }
+}
+
+// Options accepted for the `funicular` command
 #[derive(Debug, Options)]
 pub enum FunicularCommand {
+    #[options(help = "all things related to apk overlay config and build")]
     ApkOvl(ApkOvlOpts),
 }

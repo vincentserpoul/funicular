@@ -2,7 +2,10 @@ use funicular::commands::FunicularOpts;
 use gumdrop::Options;
 
 fn main() {
-    let opts = FunicularOpts::parse_args_default_or_exit();
+    let opts: FunicularOpts = FunicularOpts::parse_args_default_or_exit();
 
-    println!("{:#?}", opts);
+    match opts.run() {
+        Err(e) => println!("{:?}", e),
+        Ok(()) => println!(),
+    }
 }
