@@ -18,14 +18,10 @@ impl FunicularOpts {
     pub fn run(&self) -> Result<(), anyhow::Error> {
         match &self.command {
             Some(FunicularCommand::ApkOvl(o)) => {
-                if o.help_requested() {
-                    println!("{}", ApkOvlOpts::usage());
-                    return Ok(());
-                }
                 return o.run();
             }
             None => {
-                println!("{}", FunicularOpts::self_usage(&self));
+                println!("{}", FunicularOpts::usage());
                 println!();
                 println!("Available commands:");
                 println!("{}", FunicularOpts::command_list().unwrap());

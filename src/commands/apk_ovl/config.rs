@@ -1,4 +1,6 @@
-use anyhow;
+use anyhow::Result;
+use thiserror::Error;
+
 use gumdrop::Options;
 use std::path::PathBuf;
 
@@ -21,24 +23,16 @@ pub enum ConfigCommand {
 }
 
 impl ConfigOpts {
-    pub fn run(&self) -> Result<(), anyhow::Error> {
+    pub fn run(&self) -> Result<()> {
         match &self.command {
             Some(ConfigCommand::Gen(o)) => {
-                if o.help_requested() {
-                    println!("{}", GenOpts::usage());
-                    return Ok(());
-                }
                 return o.run();
             }
             Some(ConfigCommand::Ls(o)) => {
-                if o.help_requested() {
-                    println!("{}", LsOpts::usage());
-                    return Ok(());
-                }
                 return o.run();
             }
             None => {
-                println!("{}", ConfigOpts::self_usage(&self));
+                println!("{}", ConfigOpts::usage());
                 println!();
                 println!("Available commands:");
                 println!("{}", ConfigOpts::command_list().unwrap());
@@ -58,7 +52,7 @@ pub struct GenOpts {
 }
 
 impl GenOpts {
-    pub fn run(&self) -> Result<(), anyhow::Error> {
+    pub fn run(&self) -> Result<()> {
         println!("questionnaire");
         Ok(())
     }
@@ -73,9 +67,30 @@ pub struct LsOpts {
     system_config_path: Option<PathBuf>,
 }
 
+#[derive(Error, Debug)]
+pub enum LsError {
+    #[error("`{0}` is not a directory")]
+    NotDir(String),
+    #[error("the data for key `{0}` is not available")]
+    Redaction(String),
+    #[error("invalid header (expected {expected:?}, found {found:?})")]
+    InvalidHeader { expected: String, found: String },
+    #[error("unknown data store error")]
+    Unknown,
+}
+
 impl LsOpts {
-    pub fn run(&self) -> Result<(), anyhow::Error> {
-        println!("ls");
+    pub fn run(&self) -> Result<()> {
+        let path = &self
+            .system_config_path
+            .clone()
+            .unwrap_or(PathBuf::from("./"));
+
+        if !path.is_dir() {
+            return Err(
+                LsError::NotDir(path.to_str().unwrap().to_owned()).into()
+            );
+        }
         Ok(())
     }
 }
