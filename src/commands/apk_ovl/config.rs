@@ -2,7 +2,7 @@ use anyhow::Result;
 use thiserror::Error;
 
 use gumdrop::Options;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Options)]
 pub struct ConfigOpts {
@@ -70,27 +70,78 @@ pub struct LsOpts {
 #[derive(Error, Debug)]
 pub enum LsError {
     #[error("`{0}` is not a directory")]
-    NotDir(String),
-    #[error("the data for key `{0}` is not available")]
-    Redaction(String),
-    #[error("invalid header (expected {expected:?}, found {found:?})")]
-    InvalidHeader { expected: String, found: String },
-    #[error("unknown data store error")]
-    Unknown,
+    NotDir(PathBuf),
+    #[error("`{0}` doesn't contain any system config yet")]
+    NoConfig(PathBuf),
 }
 
 impl LsOpts {
     pub fn run(&self) -> Result<()> {
-        let path = &self
+        let system_config_path = &self
             .system_config_path
             .clone()
             .unwrap_or(PathBuf::from("./"));
-
-        if !path.is_dir() {
-            return Err(
-                LsError::NotDir(path.to_str().unwrap().to_owned()).into()
-            );
+        let systems = ls(system_config_path)?;
+        if systems.len() == 0 {
+            return Err(LsError::NoConfig(system_config_path.clone()).into());
         }
+        println!("{:?}", systems);
+
         Ok(())
+    }
+}
+
+pub fn ls(system_config_path: &Path) -> Result<Vec<String>> {
+    if !system_config_path.is_dir() {
+        return Err(LsError::NotDir(PathBuf::from(system_config_path)).into());
+    }
+
+    Ok(system_config_path
+        .read_dir()?
+        .filter_map(|entry| {
+            let entry = entry.unwrap();
+            if !entry.path().is_dir() {
+                return None;
+            }
+
+            Some(
+                entry
+                    .path()
+                    .read_dir()
+                    .unwrap()
+                    .filter_map(|entry| {
+                        let entry = entry.unwrap();
+                        let path = entry.path();
+                        if !path.is_dir()
+                            && path.file_name().unwrap() == "config.toml"
+                        {
+                            return Some(
+                                path.into_os_string().into_string().unwrap(),
+                            );
+                        }
+
+                        return None;
+                    })
+                    .collect::<Vec<String>>(),
+            )
+        })
+        .flatten()
+        .collect::<Vec<String>>())
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::ls;
+
+    #[test]
+    fn ls_out() {
+        let mut curr_path = std::env::current_dir().unwrap();
+        curr_path.push("out");
+        let lss = ls(&curr_path);
+        assert!(lss.is_ok());
+        let v = lss.unwrap();
+        assert_eq!(v.len(), 1);
+        assert!(v[0].ends_with("out/example/config.toml"));
     }
 }
