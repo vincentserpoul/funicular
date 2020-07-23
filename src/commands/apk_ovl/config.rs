@@ -53,8 +53,7 @@ pub struct GenOpts {
 
 impl GenOpts {
     pub fn run(&self) -> Result<()> {
-        println!("questionnaire");
-        Ok(())
+        todo!();
     }
 }
 
@@ -92,41 +91,46 @@ impl LsOpts {
 }
 
 pub fn ls(system_config_path: &Path) -> Result<Vec<String>> {
+    // if path is not a directory
     if !system_config_path.is_dir() {
         return Err(LsError::NotDir(PathBuf::from(system_config_path)).into());
     }
 
-    Ok(system_config_path
+    // check subfolders to see which ones fits as a system config
+    let systems = system_config_path
         .read_dir()?
-        .filter_map(|entry| {
-            let entry = entry.unwrap();
-            if !entry.path().is_dir() {
+        .filter_map(|subdir_entry| {
+            let subdir_entry = subdir_entry.unwrap();
+            if !subdir_entry.path().is_dir() {
                 return None;
             }
 
-            Some(
-                entry
-                    .path()
-                    .read_dir()
-                    .unwrap()
-                    .filter_map(|entry| {
-                        let entry = entry.unwrap();
-                        let path = entry.path();
+            let is_config = subdir_entry
+                .path()
+                .read_dir()
+                .unwrap()
+                .find(|config_entry| {
+                    if let Ok(config_entry) = config_entry {
+                        let path = config_entry.path();
                         if !path.is_dir()
                             && path.file_name().unwrap() == "config.toml"
                         {
-                            return Some(
-                                path.into_os_string().into_string().unwrap(),
-                            );
+                            return true;
                         }
+                    }
 
-                        return None;
-                    })
-                    .collect::<Vec<String>>(),
-            )
+                    return false;
+                })
+                .is_some();
+
+            if is_config {
+                return Some(subdir_entry.path().display().to_string());
+            }
+            None
         })
-        .flatten()
-        .collect::<Vec<String>>())
+        .collect::<Vec<String>>();
+
+    Ok(systems)
 }
 
 #[cfg(test)]
@@ -142,6 +146,6 @@ mod tests {
         assert!(lss.is_ok());
         let v = lss.unwrap();
         assert_eq!(v.len(), 1);
-        assert!(v[0].ends_with("out/example/config.toml"));
+        assert!(v[0].ends_with("out/example"));
     }
 }
