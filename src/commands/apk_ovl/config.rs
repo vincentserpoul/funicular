@@ -47,7 +47,7 @@ pub struct GenOpts {
     #[options(help = "show this help message")]
     help: bool,
 
-    #[options(help = "path of folder containing your system configs")]
+    #[options(help = "path of folder containing all your system configs")]
     system_config_path: Option<PathBuf>,
 }
 
@@ -62,7 +62,7 @@ pub struct LsOpts {
     #[options(help = "show this help message")]
     help: bool,
 
-    #[options(help = "path of folder containing your system configs")]
+    #[options(help = "path of folder containing all your system configs")]
     system_config_path: Option<PathBuf>,
 }
 
