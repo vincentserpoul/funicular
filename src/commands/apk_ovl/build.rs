@@ -43,7 +43,6 @@ pub fn build(
     }
 
     // config_dir
-    let config_file = config_file;
     let mut config_dir = config_file.clone();
     config_dir.pop();
 
@@ -52,6 +51,111 @@ pub fn build(
     let target_dir = target_dir.clone().unwrap_or(&default_config_dir);
 
     println!("{:?} - {:?} - {:?}", config_dir, config_file, target_dir);
+
+    // build
+    build_docker(&config_dir, target_dir)?;
+    Ok(())
+}
+
+use bollard::container::{
+    Config, CreateContainerOptions, RemoveContainerOptions,
+    StartContainerOptions, WaitContainerOptions,
+};
+use bollard::models::*;
+use bollard::Docker;
+use futures_util::stream::TryStreamExt;
+
+const DOCKER_APKOVL_BUILD_IMG: &'static str =
+    "vincentserpoul/funicular-apk:latest";
+
+fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
+    let config_dir_string = config_dir
+        .to_owned()
+        .into_os_string()
+        .into_string()
+        .unwrap();
+
+    let target_dir_string = target_dir
+        .to_owned()
+        .into_os_string()
+        .into_string()
+        .unwrap();
+
+    smol::block_on(async {
+        #[cfg(unix)]
+        let docker = Docker::connect_with_unix_defaults().unwrap();
+        #[cfg(windows)]
+        let docker = Docker::connect_with_named_pipe_defaults().unwrap();
+
+        let container_options = CreateContainerOptions {
+            name: DOCKER_APKOVL_BUILD_IMG,
+        };
+
+        let host_config = HostConfig {
+            privileged: Some(true),
+            mounts: Some(vec![
+                Mount {
+                    target: Some(String::from("/apk/config")),
+                    source: Some(config_dir_string.clone()),
+                    _type: Some(MountTypeEnum::BIND),
+                    consistency: Some(String::from("default")),
+                    ..Default::default()
+                },
+                Mount {
+                    target: Some(String::from("/apk/additional_provisioners")),
+                    source: Some(config_dir_string + "/provisioners"),
+                    _type: Some(MountTypeEnum::BIND),
+                    consistency: Some(String::from("default")),
+                    ..Default::default()
+                },
+                Mount {
+                    target: Some(String::from("/apk/target")),
+                    source: Some(target_dir_string),
+                    _type: Some(MountTypeEnum::BIND),
+                    consistency: Some(String::from("default")),
+                    ..Default::default()
+                },
+            ]),
+            ..Default::default()
+        };
+
+        let config = Config {
+            image: Some("vincentserpoul/funicular-apk"),
+            host_config: Some(host_config),
+            ..Default::default()
+        };
+
+        docker
+            .create_container(Some(container_options), config)
+            .await
+            .unwrap();
+
+        docker
+            .start_container(
+                DOCKER_APKOVL_BUILD_IMG,
+                None::<StartContainerOptions<String>>,
+            )
+            .await
+            .unwrap();
+
+        docker
+            .wait_container(
+                DOCKER_APKOVL_BUILD_IMG,
+                None::<WaitContainerOptions<String>>,
+            )
+            .try_collect::<Vec<_>>()
+            .await
+            .unwrap();
+
+        docker
+            .remove_container(
+                DOCKER_APKOVL_BUILD_IMG,
+                None::<RemoveContainerOptions>,
+            )
+            .await
+            .unwrap();
+    });
+
     Ok(())
 }
 

@@ -13,4 +13,6 @@ serde_derive = "1.0"
 thiserror = "1"
 anyhow = "1"
 gumdrop = "0.8"
-shiplift = "0.6"
+smol = { version = "0.3", features = ["tokio02"] }
+bollard = "0.7"
+futures-util = "0.3.5"
