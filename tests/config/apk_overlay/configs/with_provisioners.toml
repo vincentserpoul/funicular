@@ -1,4 +1,5 @@
 [base]
+arch = "aarch64"
 hostname = "with_provisioners"
 
 [base.alpine]

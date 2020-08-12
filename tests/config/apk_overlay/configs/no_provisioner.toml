@@ -1,4 +1,5 @@
 [base]
+arch = "armhf"
 hostname = "no_provisioner"
 
 [base.alpine]

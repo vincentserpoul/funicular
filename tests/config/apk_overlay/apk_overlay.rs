@@ -1,3 +1,4 @@
+use funicular::config::apk_overlay::base::Arch;
 use funicular::config::apk_overlay::APKOverlay;
 
 #[test]
@@ -7,6 +8,7 @@ fn alloptions_noprovisioner() {
     )
     .unwrap();
     assert_eq!(overlay.base.hostname, String::from("no_provisioner"));
+    assert_eq!(overlay.base.arch, Arch::ARMHF);
 }
 
 #[test]
@@ -16,6 +18,7 @@ fn with_provisioners() {
     )
     .unwrap();
     assert_eq!(overlay.base.hostname, String::from("with_provisioners"));
+    assert_eq!(overlay.base.arch, Arch::AARCH64);
 
     let provisioners = overlay.provisioners.unwrap();
     assert_eq!(provisioners[1].name, String::from("two_factor_auth"));
@@ -53,6 +56,7 @@ fn provisioners_to_string() {
     let test_env_vars = [
         r#"BASE_USERS_REMOTE_USER="funi"#,
         r#"BASE_HOSTNAME="no_provisioner"#,
+        r#"BASE_ARCH="armhf"#,
         r#"BASE_SSH_AUTHORIZED_KEYS="'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMIVp6q5co/r5GwY0dH+NYQbfKicapeF3gXEU3dzaAvD me@home', 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCiChinH9volauTvLfGWv2xCIo0jrQAv0jCQjfDodZW+E1vLFUcgdULKemujxG2vLzLUHfSHF9mjnwnGbyHYZi1fEO70s3gGZNd9K2xwvkGo28svefCfNR3hi+jSB9Q9drvR7CgYdEY5D90Z/OfSWJ4a60/qpD7L3uXf5riqYddDUbHVlDg11SK27KHan33UAfskd5u2AccRbXKJX3I6oO78AwI4/fHs2N/RuoleYcsHX9FNaVX8NHxSEY7EXLTPmykRQj8/8ubjuflvm4qYTsW8cFtRETfxkgFMF0p375YEVQles/6JwRsljnVaobiyeNG1u/5p4zaEguuqN7oVpsP me@home'"#,
         r#"BASE_ALPINE_MIRROR="http://dl-cdn.alpinelinux.org/alpine"#,
         r#"BASE_ALPINE_VERSION="3.12.0"#,

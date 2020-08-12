@@ -1,3 +1,4 @@
+use crate::config::apk_overlay::APKOverlay;
 use anyhow::Result;
 use gumdrop::Options;
 use std::ffi::OsString;
@@ -50,16 +51,52 @@ pub fn build(
     let default_config_dir = config_dir.clone();
     let target_dir = target_dir.clone().unwrap_or(&default_config_dir);
 
-    println!("{:?} - {:?} - {:?}", config_dir, config_file, target_dir);
+    // create config.env file
+    create_config_env_file(config_file, &config_dir)?;
 
     // build
     build_docker(&config_dir, target_dir)?;
+
+    // remove config.env file
+    // remove_config_env_file(&config_dir)?;
+
     Ok(())
 }
 
+use std::fs;
+use std::fs::File;
+use std::io::prelude::*;
+
+fn create_config_env_file(
+    config_file: &PathBuf,
+    config_dir: &PathBuf,
+) -> Result<()> {
+    // generate the config.env
+    let overlay = APKOverlay::from_path(config_file)?;
+
+    // create config_dir/config.env
+    let mut config_file_path = config_dir.clone();
+    config_file_path.push("config.env");
+
+    println!("{:?}", config_file_path);
+    let mut file = File::create(config_file_path)?;
+
+    // Write the `LOREM_IPSUM` string to `file`, returns `io::Result<()>`
+    file.write_all(overlay.to_string().as_bytes())?;
+
+    Ok(())
+}
+
+fn remove_config_env_file(config_dir: &PathBuf) -> Result<()> {
+    let mut config_file_path = config_dir.clone();
+    config_file_path.push("config.env");
+    fs::remove_file(config_file_path)?;
+    Ok(())
+}
+
+//RemoveContainerOptions
 use bollard::container::{
-    Config, CreateContainerOptions, RemoveContainerOptions,
-    StartContainerOptions, WaitContainerOptions,
+    Config, CreateContainerOptions, StartContainerOptions, WaitContainerOptions,
 };
 use bollard::models::*;
 use bollard::Docker;
@@ -67,6 +104,8 @@ use futures_util::stream::TryStreamExt;
 
 const DOCKER_APKOVL_BUILD_IMG: &'static str =
     "vincentserpoul/funicular-apk:latest";
+
+const DOCKER_APKOVL_CONTAINER_NAME: &'static str = "funicular-apk";
 
 fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
     let config_dir_string = config_dir
@@ -88,7 +127,7 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
         let docker = Docker::connect_with_named_pipe_defaults().unwrap();
 
         let container_options = CreateContainerOptions {
-            name: DOCKER_APKOVL_BUILD_IMG,
+            name: DOCKER_APKOVL_CONTAINER_NAME,
         };
 
         let host_config = HostConfig {
@@ -120,7 +159,7 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
         };
 
         let config = Config {
-            image: Some("vincentserpoul/funicular-apk"),
+            image: Some(DOCKER_APKOVL_BUILD_IMG),
             host_config: Some(host_config),
             ..Default::default()
         };
@@ -132,7 +171,7 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
 
         docker
             .start_container(
-                DOCKER_APKOVL_BUILD_IMG,
+                DOCKER_APKOVL_CONTAINER_NAME,
                 None::<StartContainerOptions<String>>,
             )
             .await
@@ -140,20 +179,20 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
 
         docker
             .wait_container(
-                DOCKER_APKOVL_BUILD_IMG,
+                DOCKER_APKOVL_CONTAINER_NAME,
                 None::<WaitContainerOptions<String>>,
             )
             .try_collect::<Vec<_>>()
             .await
             .unwrap();
 
-        docker
-            .remove_container(
-                DOCKER_APKOVL_BUILD_IMG,
-                None::<RemoveContainerOptions>,
-            )
-            .await
-            .unwrap();
+        // docker
+        //     .remove_container(
+        //         DOCKER_APKOVL_CONTAINER_NAME,
+        //         None::<RemoveContainerOptions>,
+        //     )
+        //     .await
+        //     .unwrap();
     });
 
     Ok(())

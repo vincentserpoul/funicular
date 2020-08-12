@@ -3,10 +3,28 @@ use semver::Version;
 use serde_derive::Deserialize;
 use sshkeys::PublicKey;
 use std::collections::HashMap;
+use std::fmt;
 use std::net::{IpAddr, Ipv4Addr};
+
+#[derive(Debug, Deserialize, PartialEq, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum Arch {
+    AARCH64,
+    ARMHF,
+}
+
+impl fmt::Display for Arch {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Arch::AARCH64 => write!(f, "aarch64"),
+            Arch::ARMHF => write!(f, "armhf"),
+        }
+    }
+}
 
 #[derive(Debug, Deserialize)]
 pub struct Base {
+    pub arch: Arch,
     pub hostname: String,
     pub alpine: Alpine,
     pub networking: Networking,
@@ -17,6 +35,7 @@ pub struct Base {
 impl Default for Base {
     fn default() -> Self {
         Self {
+            arch: Arch::AARCH64,
             hostname: String::from(""),
             alpine: Alpine::default(),
             networking: Networking::default(),
@@ -34,11 +53,17 @@ impl Default for Base {
 
 impl EnvVars for Base {
     fn to_hash_map(&self, _existing_key: &str) -> HashMap<String, String> {
-        let mut hm = [("BASE_HOSTNAME".to_owned(), self.hostname.clone())]
+        let mut hm = [("BASE_ARCH".to_owned(), self.arch.to_string())]
             .iter()
             .cloned()
             .collect::<HashMap<String, String>>();
-        hm.extend::<HashMap<String, String>>(self.alpine.to_hash_map("BASE"));
+        hm.extend(
+            [("BASE_HOSTNAME".to_owned(), self.hostname.clone())]
+                .iter()
+                .cloned()
+                .collect::<HashMap<String, String>>(),
+        );
+        hm.extend(self.alpine.to_hash_map("BASE"));
         hm.extend(self.networking.to_hash_map("BASE"));
         hm.extend(self.ssh.to_hash_map("BASE"));
         hm.extend(self.users.to_hash_map("BASE"));

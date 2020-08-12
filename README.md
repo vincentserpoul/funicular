@@ -13,3 +13,9 @@ Automate alpine deployment on SBCs (rpi0, rpi2, rpi3, rpi4...).
 
 We used a narrow concept of [packer provisioners](https://www.packer.io/docs/provisioners/shell-local/), by only allowing a shell-local configuration in order to simplify the configurations.
 Check the test or example folder to check some examples of provisioners.
+
+## Todo
+
+[] config file and target dir as params
+[] docker logs visible
+[] docker error visible
