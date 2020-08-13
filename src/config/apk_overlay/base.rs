@@ -83,7 +83,7 @@ pub enum Branch {
 impl fmt::Display for Branch {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Branch::EDGE => write!(f, "aarch64"),
+            Branch::EDGE => write!(f, "edge"),
             Branch::LatestStable => write!(f, "latest-stable"),
         }
     }
@@ -94,7 +94,7 @@ impl FromStr for Branch {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "edge" => Ok(Branch::EDGE),
-            "lastest-stable" => Ok(Branch::LatestStable),
+            "latest-stable" => Ok(Branch::LatestStable),
             _ => Ok(Branch::LatestStable),
         }
     }
@@ -105,7 +105,21 @@ pub struct Keymap(String, String);
 
 impl fmt::Display for Keymap {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?} {:?}", self.0, self.1)
+        write!(f, "{} {}", self.0, self.1)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    // Note this useful idiom: importing names from outer (for mod tests) scope.
+    use super::*;
+
+    #[test]
+    fn keymap_string() {
+        assert_eq!(
+            Keymap(String::from("us"), String::from("us")).to_string(),
+            "us us"
+        );
     }
 }
 
@@ -206,15 +220,12 @@ impl EnvVars for Networking {
     fn to_hash_map(&self, existing_key: &str) -> HashMap<String, String> {
         [(
             existing_key.to_owned() + "_" + "NETWORKING_DNS_NAMESERVERS",
-            (String::from("'")
-                + self
-                    .dns_nameservers
-                    .iter()
-                    .map(|ip| ip.to_string())
-                    .collect::<Vec<String>>()
-                    .join("', '")
-                    .as_str()
-                + "'"),
+            (self
+                .dns_nameservers
+                .iter()
+                .map(|ip| ip.to_string())
+                .collect::<Vec<String>>()
+                .join(", ")),
         )]
         .iter()
         .cloned()
