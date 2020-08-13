@@ -1,6 +1,7 @@
 use super::env_vars::EnvVars;
 use semver::Version;
 use serde_derive::Deserialize;
+use serde_with;
 use sshkeys::PublicKey;
 use std::collections::HashMap;
 use std::fmt;
@@ -71,11 +72,74 @@ impl EnvVars for Base {
     }
 }
 
+use std::str::FromStr;
+
+#[derive(Debug, Deserialize, PartialEq, Clone)]
+pub enum Branch {
+    EDGE,
+    LatestStable,
+}
+
+impl fmt::Display for Branch {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Branch::EDGE => write!(f, "aarch64"),
+            Branch::LatestStable => write!(f, "latest-stable"),
+        }
+    }
+}
+
+impl FromStr for Branch {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "edge" => Ok(Branch::EDGE),
+            "lastest-stable" => Ok(Branch::LatestStable),
+            _ => Ok(Branch::LatestStable),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, PartialEq, Clone)]
+pub struct Keymap(String, String);
+
+impl fmt::Display for Keymap {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?} {:?}", self.0, self.1)
+    }
+}
+
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum ParseKeymapError {
+    #[error("`{0}` can not be parsed as keymap")]
+    TooManyElements(String),
+}
+
+impl FromStr for Keymap {
+    type Err = ParseKeymapError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut iter = s.split_whitespace();
+        if iter.clone().count() != 2 {
+            return Err(ParseKeymapError::TooManyElements(s.into()));
+        }
+        let km1 = iter.next().unwrap();
+        let km2 = iter.next().unwrap();
+
+        Ok(Keymap(km1.into(), km2.into()))
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Alpine {
     pub mirror: String,
     pub version: Version,
     pub timezone: String,
+    #[serde(with = "serde_with::rust::display_fromstr")]
+    pub branch: Branch,
+    #[serde(with = "serde_with::rust::display_fromstr")]
+    pub keymap: Keymap,
 }
 
 impl Default for Alpine {
@@ -84,6 +148,8 @@ impl Default for Alpine {
             mirror: String::from("http://dl-cdn.alpinelinux.org/alpine"),
             version: "3.12.0".parse().unwrap(),
             timezone: String::from("Asia/Singapore"),
+            branch: Branch::LatestStable,
+            keymap: Keymap(String::from("us"), String::from("us")),
         }
     }
 }
@@ -102,6 +168,16 @@ impl EnvVars for Alpine {
             (
                 existing_key.to_owned() + "_" + "ALPINE_TIMEZONE",
                 self.timezone.clone(),
+            ),
+            (
+                existing_key.to_owned() + "_" + "ALPINE_BRANCH",
+                // todo: do an enum
+                self.branch.to_string(),
+            ),
+            (
+                existing_key.to_owned() + "_" + "ALPINE_KEYMAP",
+                // todo: do an enum
+                self.keymap.to_string(),
             ),
         ]
         .iter()
