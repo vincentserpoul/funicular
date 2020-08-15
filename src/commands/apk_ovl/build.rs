@@ -86,8 +86,11 @@ fn create_config_env_file(
 }
 
 use bollard::container::{
-    Config, CreateContainerOptions, LogsOptions, StartContainerOptions,
+    Config,
+    CreateContainerOptions,
+    StartContainerOptions,
     WaitContainerOptions,
+    // LogsOptions,
 };
 use bollard::models::*;
 use bollard::Docker;
@@ -161,11 +164,6 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
             .await
             .unwrap();
 
-        let log_options = Some(LogsOptions {
-            stdout: true,
-            ..Default::default()
-        });
-
         docker
             .start_container(
                 DOCKER_APKOVL_CONTAINER_NAME,
@@ -183,11 +181,16 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
             .await
             .unwrap();
 
-        docker
-            .logs(DOCKER_APKOVL_CONTAINER_NAME, log_options)
-            .try_collect::<Vec<_>>()
-            .await
-            .unwrap();
+        // let log_options = Some(LogsOptions {
+        //     stdout: true,
+        //     ..Default::default()
+        // });
+
+        // docker
+        //     .logs(DOCKER_APKOVL_CONTAINER_NAME, log_options)
+        //     .try_collect::<Vec<_>>()
+        //     .await
+        //     .unwrap();
     });
 
     Ok(())
