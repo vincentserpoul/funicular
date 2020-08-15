@@ -16,6 +16,8 @@ Check the test or example folder to check some examples of provisioners.
 
 ## Todo
 
-[] config file and target dir as params
-[] docker logs visible
-[] docker error visible
+[ ] config file and target dir as params
+[ ] docker logs visible
+[ ] docker error visible
+[ ] switch from latest-stable to v3.12
+[ ] auto rm when we quit funicular

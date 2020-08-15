@@ -63,10 +63,15 @@ fn provisioners_to_string() {
         r#"BASE_ALPINE_TIMEZONE="Asia/Singapore"#,
         r#"BASE_USERS_REMOTE_USER_PASSWORD="funipass"#,
         r#"BASE_USERS_ROOT_PASSWORD="rootpass"#,
-        r#"BASE_NETWORKING_DNS_NAMESERVERS="'8.8.8.8', '1.1.1.1'"#,
+        r#"BASE_NETWORKING_DNS_NAMESERVERS="8.8.8.8, 1.1.1.1"#,
     ];
 
     test_env_vars.iter().for_each(|s| {
-        assert_eq!(overlay.contains(*s), true);
+        assert_eq!(
+            overlay.contains(*s),
+            true,
+            "should contain {}, but did not",
+            *s
+        );
     });
 }

@@ -6,6 +6,8 @@ hostname = "no_provisioner"
 mirror = "http://dl-cdn.alpinelinux.org/alpine"
 version = "3.12.0"
 timezone = "Asia/Singapore"
+branch = "latest-stable"
+keymap = "us us"
 
 [base.networking]
 dns_nameservers = ["8.8.8.8", "1.1.1.1"]

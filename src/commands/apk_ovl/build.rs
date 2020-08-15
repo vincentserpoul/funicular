@@ -63,7 +63,6 @@ pub fn build(
     Ok(())
 }
 
-use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -78,7 +77,6 @@ fn create_config_env_file(
     let mut config_file_path = config_dir.clone();
     config_file_path.push("config.env");
 
-    println!("{:?}", config_file_path);
     let mut file = File::create(config_file_path)?;
 
     // Write the `LOREM_IPSUM` string to `file`, returns `io::Result<()>`
@@ -87,16 +85,9 @@ fn create_config_env_file(
     Ok(())
 }
 
-fn remove_config_env_file(config_dir: &PathBuf) -> Result<()> {
-    let mut config_file_path = config_dir.clone();
-    config_file_path.push("config.env");
-    fs::remove_file(config_file_path)?;
-    Ok(())
-}
-
-//RemoveContainerOptions
 use bollard::container::{
-    Config, CreateContainerOptions, StartContainerOptions, WaitContainerOptions,
+    Config, CreateContainerOptions, LogsOptions, StartContainerOptions,
+    WaitContainerOptions,
 };
 use bollard::models::*;
 use bollard::Docker;
@@ -132,24 +123,25 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
 
         let host_config = HostConfig {
             privileged: Some(true),
+            auto_remove: Some(true),
             mounts: Some(vec![
                 Mount {
-                    target: Some(String::from("/apk/config")),
                     source: Some(config_dir_string.clone()),
+                    target: Some(String::from("/apk/config")),
                     _type: Some(MountTypeEnum::BIND),
                     consistency: Some(String::from("default")),
                     ..Default::default()
                 },
                 Mount {
-                    target: Some(String::from("/apk/additional_provisioners")),
                     source: Some(config_dir_string + "/provisioners"),
+                    target: Some(String::from("/apk/additional_provisioners")),
                     _type: Some(MountTypeEnum::BIND),
                     consistency: Some(String::from("default")),
                     ..Default::default()
                 },
                 Mount {
-                    target: Some(String::from("/apk/target")),
                     source: Some(target_dir_string),
+                    target: Some(String::from("/target")),
                     _type: Some(MountTypeEnum::BIND),
                     consistency: Some(String::from("default")),
                     ..Default::default()
@@ -169,6 +161,11 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
             .await
             .unwrap();
 
+        let log_options = Some(LogsOptions {
+            stdout: true,
+            ..Default::default()
+        });
+
         docker
             .start_container(
                 DOCKER_APKOVL_CONTAINER_NAME,
@@ -186,13 +183,11 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
             .await
             .unwrap();
 
-        // docker
-        //     .remove_container(
-        //         DOCKER_APKOVL_CONTAINER_NAME,
-        //         None::<RemoveContainerOptions>,
-        //     )
-        //     .await
-        //     .unwrap();
+        docker
+            .logs(DOCKER_APKOVL_CONTAINER_NAME, log_options)
+            .try_collect::<Vec<_>>()
+            .await
+            .unwrap();
     });
 
     Ok(())
