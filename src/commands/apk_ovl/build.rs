@@ -55,7 +55,7 @@ pub fn build(
     create_config_env_file(config_file, &config_dir)?;
 
     // build
-    build_docker(&config_dir, target_dir)?;
+    build_via_docker(&config_dir, target_dir)?;
 
     // remove config.env file
     // remove_config_env_file(&config_dir)?;
@@ -95,13 +95,13 @@ use bollard::container::{
 use bollard::models::*;
 use bollard::Docker;
 use futures_util::stream::TryStreamExt;
+use tokio::runtime::Runtime;
 
-const DOCKER_APKOVL_BUILD_IMG: &'static str =
-    "vincentserpoul/funicular-apk:latest";
+const DOCKER_APKOVL_BUILD_IMG: &'static str = "vincentserpoul/funicular:latest";
 
-const DOCKER_APKOVL_CONTAINER_NAME: &'static str = "funicular-apk";
+const DOCKER_APKOVL_CONTAINER_NAME: &'static str = "funicular";
 
-fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
+fn build_via_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
     let config_dir_string = config_dir
         .to_owned()
         .into_os_string()
@@ -114,7 +114,8 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
         .into_string()
         .unwrap();
 
-    smol::block_on(async {
+    let mut rt = Runtime::new().unwrap();
+    rt.block_on(async {
         #[cfg(unix)]
         let docker = Docker::connect_with_unix_defaults().unwrap();
         #[cfg(windows)]
@@ -131,21 +132,21 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
                 Mount {
                     source: Some(config_dir_string.clone()),
                     target: Some(String::from("/apk/config")),
-                    _type: Some(MountTypeEnum::BIND),
+                    typ: Some(MountTypeEnum::BIND),
                     consistency: Some(String::from("default")),
                     ..Default::default()
                 },
                 Mount {
                     source: Some(config_dir_string + "/provisioners"),
                     target: Some(String::from("/apk/additional_provisioners")),
-                    _type: Some(MountTypeEnum::BIND),
+                    typ: Some(MountTypeEnum::BIND),
                     consistency: Some(String::from("default")),
                     ..Default::default()
                 },
                 Mount {
                     source: Some(target_dir_string),
                     target: Some(String::from("/target")),
-                    _type: Some(MountTypeEnum::BIND),
+                    typ: Some(MountTypeEnum::BIND),
                     consistency: Some(String::from("default")),
                     ..Default::default()
                 },
@@ -156,6 +157,10 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
         let config = Config {
             image: Some(DOCKER_APKOVL_BUILD_IMG),
             host_config: Some(host_config),
+            cmd: Some(vec!["-w", "rpi", "-d", "/dev/sda", "-f"]),
+            attach_stdin: Some(true),
+            attach_stdout: Some(true),
+            attach_stderr: Some(true),
             ..Default::default()
         };
 
@@ -180,17 +185,6 @@ fn build_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
             .try_collect::<Vec<_>>()
             .await
             .unwrap();
-
-        // let log_options = Some(LogsOptions {
-        //     stdout: true,
-        //     ..Default::default()
-        // });
-
-        // docker
-        //     .logs(DOCKER_APKOVL_CONTAINER_NAME, log_options)
-        //     .try_collect::<Vec<_>>()
-        //     .await
-        //     .unwrap();
     });
 
     Ok(())
