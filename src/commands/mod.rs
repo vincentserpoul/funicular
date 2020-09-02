@@ -1,7 +1,10 @@
-pub mod apk_ovl;
+pub mod build;
+pub mod config;
 
 use anyhow;
-use apk_ovl::ApkOvlOpts;
+use build::BuildOpts;
+use config::ConfigOpts;
+
 use gumdrop::Options;
 
 // Define options for the program.
@@ -17,7 +20,10 @@ pub struct FunicularOpts {
 impl FunicularOpts {
     pub fn run(&self) -> Result<(), anyhow::Error> {
         match &self.command {
-            Some(FunicularCommand::ApkOvl(o)) => {
+            Some(FunicularCommand::Config(o)) => {
+                return o.run();
+            }
+            Some(FunicularCommand::Build(o)) => {
                 return o.run();
             }
             None => {
@@ -34,6 +40,9 @@ impl FunicularOpts {
 // Options accepted for the `funicular` command
 #[derive(Debug, Options)]
 pub enum FunicularCommand {
-    #[options(help = "all things related to apk overlay config and build")]
-    ApkOvl(ApkOvlOpts),
+    #[options(help = "apk overlay config")]
+    Config(ConfigOpts),
+
+    #[options(help = "build your apk overlay")]
+    Build(BuildOpts),
 }

@@ -1,90 +1,5 @@
-use crate::config::apk_overlay::APKOverlay;
+use super::hardware::Hardware;
 use anyhow::Result;
-use gumdrop::Options;
-use std::ffi::OsString;
-use std::path::PathBuf;
-use thiserror::Error;
-
-// Options accepted for the `build` command
-#[derive(Debug, Options)]
-pub struct BuildOpts {
-    #[options(help = "show this help message")]
-    pub help: bool,
-
-    #[options(
-        help = "target directory for your apkovl (usually same as your config file folder)"
-    )]
-    target_dir: Option<PathBuf>,
-
-    #[options(required, help = "path of your config file")]
-    config_file: PathBuf,
-}
-
-#[derive(Error, Debug)]
-pub enum BuildError {
-    #[error("`{0}` is not a toml config file")]
-    NotTOMLConfigFile(PathBuf),
-}
-
-impl BuildOpts {
-    pub fn run(&self) -> Result<()> {
-        build(&self.config_file, *&self.target_dir.as_ref())?;
-        Ok(())
-    }
-}
-
-pub fn build(
-    config_file: &PathBuf,
-    target_dir: Option<&PathBuf>,
-) -> Result<()> {
-    if !config_file.is_file()
-        || config_file.extension() != Some(OsString::from("toml").as_os_str())
-    {
-        return Err(BuildError::NotTOMLConfigFile(config_file.clone()).into());
-    }
-
-    // config_dir
-    let mut config_dir = config_file.clone();
-    config_dir.pop();
-
-    // if target_dir is None, use the config dir
-    let default_config_dir = config_dir.clone();
-    let target_dir = target_dir.clone().unwrap_or(&default_config_dir);
-
-    // create config.env file
-    create_config_env_file(config_file, &config_dir)?;
-
-    // build
-    build_via_docker(&config_dir, target_dir)?;
-
-    // remove config.env file
-    // remove_config_env_file(&config_dir)?;
-
-    Ok(())
-}
-
-use std::fs::File;
-use std::io::prelude::*;
-
-fn create_config_env_file(
-    config_file: &PathBuf,
-    config_dir: &PathBuf,
-) -> Result<()> {
-    // generate the config.env
-    let overlay = APKOverlay::from_path(config_file)?;
-
-    // create config_dir/config.env
-    let mut config_file_path = config_dir.clone();
-    config_file_path.push("config.env");
-
-    let mut file = File::create(config_file_path)?;
-
-    // Write the `LOREM_IPSUM` string to `file`, returns `io::Result<()>`
-    file.write_all(overlay.to_string().as_bytes())?;
-
-    Ok(())
-}
-
 use bollard::container::{
     Config,
     CreateContainerOptions,
@@ -95,13 +10,19 @@ use bollard::container::{
 use bollard::models::*;
 use bollard::Docker;
 use futures_util::stream::TryStreamExt;
+use std::path::PathBuf;
 use tokio::runtime::Runtime;
 
 const DOCKER_APKOVL_BUILD_IMG: &'static str = "vincentserpoul/funicular:latest";
-
 const DOCKER_APKOVL_CONTAINER_NAME: &'static str = "funicular";
 
-fn build_via_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
+pub fn run_build(
+    config_dir: &PathBuf,
+    target_dir: &PathBuf,
+    hardware: Option<Hardware>,
+    device_path: Option<&PathBuf>,
+    force_device_write: Option<bool>,
+) -> Result<()> {
     let config_dir_string = config_dir
         .to_owned()
         .into_os_string()
@@ -154,10 +75,27 @@ fn build_via_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
             ..Default::default()
         };
 
+        let mut cmd_option: Vec<String> = Vec::new();
+
+        if let Some(h) = hardware {
+            cmd_option.push(String::from("-w"));
+            cmd_option.push(h.to_string());
+        }
+        if let Some(d) = device_path {
+            cmd_option.push(String::from("-d"));
+            let ds = d.clone().into_os_string().into_string().unwrap();
+            cmd_option.push(ds.to_string());
+            if let Some(f) = force_device_write {
+                if f {
+                    cmd_option.push(String::from("-f"));
+                }
+            }
+        }
+
         let config = Config {
             image: Some(DOCKER_APKOVL_BUILD_IMG),
             host_config: Some(host_config),
-            cmd: Some(vec!["-w", "rpi", "-d", "/dev/sda", "-f"]),
+            cmd: Some(cmd_option.iter().map(AsRef::as_ref).collect()),
             attach_stdin: Some(true),
             attach_stdout: Some(true),
             attach_stderr: Some(true),
@@ -188,29 +126,4 @@ fn build_via_docker(config_dir: &PathBuf, target_dir: &PathBuf) -> Result<()> {
     });
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-
-    use super::*;
-
-    #[test]
-    fn build_nofile() {
-        let curr_path = std::env::current_dir().unwrap();
-        let err = build(&curr_path, None).map_err(|e| e.to_string());
-        let expected = Err(BuildError::NotTOMLConfigFile(curr_path))
-            .map_err(|e| e.to_string());
-        assert_eq!(err, expected);
-    }
-
-    #[test]
-    fn build_not_toml_file() {
-        let mut curr_path = std::env::current_dir().unwrap();
-        curr_path.push("config.yaml");
-        let err = build(&curr_path, None).map_err(|e| e.to_string());
-        let expected = Err(BuildError::NotTOMLConfigFile(curr_path))
-            .map_err(|e| e.to_string());
-        assert_eq!(err, expected);
-    }
 }

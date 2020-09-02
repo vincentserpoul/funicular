@@ -1,7 +1,6 @@
 use super::env_vars::EnvVars;
 use semver::Version;
 use serde_derive::Deserialize;
-use serde_with;
 use sshkeys::PublicKey;
 use std::collections::HashMap;
 use std::fmt;
