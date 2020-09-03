@@ -3,6 +3,12 @@ name = "funicular"
 version = "0.1.0"
 authors = ["Vincent Serpoul <vincent@serpoul.com>"]
 edition = "2018"
+description = "Creation of APK overlay for headless, stateless alpine sbc creation"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/vincentserpoul/funicular"
+keywords = ["alpine", "sbc", "rpi"]
+readme = "README.md"
+categories = ["hardware"]
 
 [dependencies]
 serde = "1.0"
@@ -11,8 +17,8 @@ semver = { version = "0.10.0", features = ["serde"] }
 sshkeys = { version = "0.3", features = ["serde"] }
 serde_derive = "1.0"
 serde_with = "1.4.0"
-thiserror = "1"
-anyhow = "1"
+thiserror = "1.0.20"
+anyhow = "1.0.32"
 gumdrop = "0.8"
 tokio = "0.2"
 bollard = "0.8"

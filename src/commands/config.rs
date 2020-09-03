@@ -25,18 +25,14 @@ pub enum ConfigCommand {
 impl ConfigOpts {
     pub fn run(&self) -> Result<()> {
         match &self.command {
-            Some(ConfigCommand::Gen(o)) => {
-                return o.run();
-            }
-            Some(ConfigCommand::Ls(o)) => {
-                return o.run();
-            }
+            Some(ConfigCommand::Gen(o)) => o.run(),
+            Some(ConfigCommand::Ls(o)) => o.run(),
             None => {
                 println!("{}", ConfigOpts::usage());
                 println!();
                 println!("Available commands:");
                 println!("{}", ConfigOpts::command_list().unwrap());
-                return Ok(());
+                Ok(())
             }
         }
     }
@@ -79,9 +75,9 @@ impl LsOpts {
         let system_config_path = &self
             .system_config_path
             .clone()
-            .unwrap_or(PathBuf::from("./"));
+            .unwrap_or_else(|| PathBuf::from("./"));
         let systems = ls(system_config_path)?;
-        if systems.len() == 0 {
+        if systems.is_empty() {
             return Err(LsError::NoConfig(system_config_path.clone()).into());
         }
         println!("{:?}", systems);
@@ -105,23 +101,16 @@ pub fn ls(system_config_path: &Path) -> Result<Vec<String>> {
                 return None;
             }
 
-            let is_config = subdir_entry
-                .path()
-                .read_dir()
-                .unwrap()
-                .find(|config_entry| {
-                    if let Ok(config_entry) = config_entry {
-                        let path = config_entry.path();
-                        if !path.is_dir()
-                            && path.file_name().unwrap() == "config.toml"
-                        {
-                            return true;
-                        }
+            let is_config = subdir_entry.path().read_dir().unwrap().any(|config_entry| {
+                if let Ok(config_entry) = config_entry {
+                    let path = config_entry.path();
+                    if !path.is_dir() && path.file_name().unwrap() == "config.toml" {
+                        return true;
                     }
+                }
 
-                    return false;
-                })
-                .is_some();
+                false
+            });
 
             if is_config {
                 return Some(subdir_entry.path().display().to_string());

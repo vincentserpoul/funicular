@@ -4,6 +4,7 @@ use crate::config::apk_overlay::APKOverlay;
 use crate::docker;
 use crate::hardware::Hardware;
 use anyhow::Result;
+use device::check_path;
 use gumdrop::Options;
 use std::ffi::OsString;
 use std::path::PathBuf;
@@ -41,10 +42,10 @@ impl BuildOpts {
     pub fn run(&self) -> Result<()> {
         build(
             &self.config_file,
-            *&self.target_dir.as_ref(),
-            *&self.hardware,
-            *&self.device_path.as_ref(),
-            *&self.force_device_write,
+            self.target_dir.as_ref(),
+            self.hardware,
+            self.device_path.as_ref(),
+            self.force_device_write,
         )?;
         Ok(())
     }
@@ -60,6 +61,10 @@ pub fn build(
     if !config_file.is_file() || config_file.extension() != Some(OsString::from("toml").as_os_str())
     {
         return Err(BuildError::NotTOMLConfigFile(config_file.clone()).into());
+    }
+
+    if let Some(dp) = device_path {
+        check_path(dp)?;
     }
 
     // config_dir

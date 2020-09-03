@@ -3,15 +3,15 @@ use std::path::{Path, PathBuf};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum DeviceError {
+pub enum Error {
     #[error("`{0}` is does not seem to exist")]
     NotDir(PathBuf),
 }
 
-pub fn check_device(device_path: &Path) -> Result<()> {
+pub fn check_path(device_path: &Path) -> Result<()> {
     // if path is not a directory
     if !device_path.is_dir() {
-        return Err(DeviceError::NotDir(PathBuf::from(device_path)).into());
+        return Err(Error::NotDir(PathBuf::from(device_path)).into());
     }
 
     Ok(())

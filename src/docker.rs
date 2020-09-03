@@ -13,8 +13,8 @@ use futures_util::stream::TryStreamExt;
 use std::path::PathBuf;
 use tokio::runtime::Runtime;
 
-const DOCKER_APKOVL_BUILD_IMG: &'static str = "vincentserpoul/funicular:latest";
-const DOCKER_APKOVL_CONTAINER_NAME: &'static str = "funicular";
+const DOCKER_APKOVL_BUILD_IMG: &str = "vincentserpoul/funicular:latest";
+const DOCKER_APKOVL_CONTAINER_NAME: &str = "funicular";
 
 pub fn run_build(
     config_dir: &PathBuf,
@@ -84,7 +84,7 @@ pub fn run_build(
         if let Some(d) = device_path {
             cmd_option.push(String::from("-d"));
             let ds = d.clone().into_os_string().into_string().unwrap();
-            cmd_option.push(ds.to_string());
+            cmd_option.push(ds);
             if let Some(f) = force_device_write {
                 if f {
                     cmd_option.push(String::from("-f"));

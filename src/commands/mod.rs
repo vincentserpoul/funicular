@@ -1,7 +1,6 @@
 pub mod build;
 pub mod config;
 
-use anyhow;
 use build::BuildOpts;
 use config::ConfigOpts;
 
@@ -20,18 +19,14 @@ pub struct FunicularOpts {
 impl FunicularOpts {
     pub fn run(&self) -> Result<(), anyhow::Error> {
         match &self.command {
-            Some(FunicularCommand::Config(o)) => {
-                return o.run();
-            }
-            Some(FunicularCommand::Build(o)) => {
-                return o.run();
-            }
+            Some(FunicularCommand::Config(o)) => o.run(),
+            Some(FunicularCommand::Build(o)) => o.run(),
             None => {
                 println!("{}", FunicularOpts::usage());
                 println!();
                 println!("Available commands:");
                 println!("{}", FunicularOpts::command_list().unwrap());
-                return Ok(());
+                Ok(())
             }
         }
     }
