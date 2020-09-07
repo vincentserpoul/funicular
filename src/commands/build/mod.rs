@@ -7,6 +7,8 @@ use anyhow::Result;
 use device::check_path;
 use gumdrop::Options;
 use std::ffi::OsString;
+use std::fs::File;
+use std::io::prelude::*;
 use std::path::PathBuf;
 use thiserror::Error;
 
@@ -87,14 +89,8 @@ pub fn build(
         force_device_write,
     )?;
 
-    // remove config.env file
-    // remove_config_env_file(&config_dir)?;
-
     Ok(())
 }
-
-use std::fs::File;
-use std::io::prelude::*;
 
 fn create_config_env_file(config_file: &PathBuf, config_dir: &PathBuf) -> Result<()> {
     // generate the config.env
@@ -106,7 +102,7 @@ fn create_config_env_file(config_file: &PathBuf, config_dir: &PathBuf) -> Result
 
     let mut file = File::create(config_file_path)?;
 
-    // Write the `LOREM_IPSUM` string to `file`, returns `io::Result<()>`
+    // Write the config string to `file`, returns `io::Result<()>`
     file.write_all(overlay.to_string().as_bytes())?;
 
     Ok(())

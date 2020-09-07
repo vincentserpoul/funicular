@@ -58,7 +58,7 @@ impl APKOverlay {
             });
 
             // provisioners'list
-            if ps.is_empty() {
+            if !ps.is_empty() {
                 hm.extend::<HashMap<String, String>>(
                     [("provisioners".to_uppercase(), ps.join(" "))]
                         .iter()

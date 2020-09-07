@@ -10,7 +10,7 @@ pub enum Error {
 
 pub fn check_path(device_path: &Path) -> Result<()> {
     // if path is not a directory
-    if !device_path.is_dir() {
+    if !device_path.exists() {
         return Err(Error::NotDir(PathBuf::from(device_path)).into());
     }
 

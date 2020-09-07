@@ -1,12 +1,6 @@
 use super::hardware::Hardware;
 use anyhow::Result;
-use bollard::container::{
-    Config,
-    CreateContainerOptions,
-    StartContainerOptions,
-    WaitContainerOptions,
-    // LogsOptions,
-};
+use bollard::container::{Config, CreateContainerOptions, LogsOptions, StartContainerOptions};
 use bollard::models::*;
 use bollard::Docker;
 use futures_util::stream::TryStreamExt;
@@ -78,7 +72,7 @@ pub fn run_build(
         let mut cmd_option: Vec<String> = Vec::new();
 
         if let Some(h) = hardware {
-            cmd_option.push(String::from("-w"));
+            cmd_option.push(String::from("-H"));
             cmd_option.push(h.to_string());
         }
         if let Some(d) = device_path {
@@ -96,9 +90,6 @@ pub fn run_build(
             image: Some(DOCKER_APKOVL_BUILD_IMG),
             host_config: Some(host_config),
             cmd: Some(cmd_option.iter().map(AsRef::as_ref).collect()),
-            attach_stdin: Some(true),
-            attach_stdout: Some(true),
-            attach_stderr: Some(true),
             ..Default::default()
         };
 
@@ -115,11 +106,17 @@ pub fn run_build(
             .await
             .unwrap();
 
+        let log_options = Some(LogsOptions::<String> {
+            stdout: true,
+            stderr: true,
+            follow: true,
+            ..Default::default()
+        });
+
         docker
-            .wait_container(
-                DOCKER_APKOVL_CONTAINER_NAME,
-                None::<WaitContainerOptions<String>>,
-            )
+            .logs(DOCKER_APKOVL_CONTAINER_NAME, log_options)
+            .map_err(|e| println!("{:?}", e))
+            .map_ok(|x| println!("{:?}", x))
             .try_collect::<Vec<_>>()
             .await
             .unwrap();
