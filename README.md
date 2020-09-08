@@ -16,6 +16,4 @@ Check the test or example folder to check some examples of provisioners.
 
 ## Todo
 
-    [x] docker logs visible
-    [ ] docker logs readable
     [ ] switch from latest-stable to v3.12

@@ -115,8 +115,8 @@ pub fn run_build(
 
         docker
             .logs(DOCKER_APKOVL_CONTAINER_NAME, log_options)
-            .map_err(|e| println!("{:?}", e))
-            .map_ok(|x| println!("{:?}", x))
+            .map_err(|e| println!("{}", e.to_string()))
+            .map_ok(|x| println!("{}", x.to_string()))
             .try_collect::<Vec<_>>()
             .await
             .unwrap();
