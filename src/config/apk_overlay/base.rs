@@ -2,13 +2,13 @@ use super::env_vars::EnvVars;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use semver::Version;
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
 use sshkeys::PublicKey;
 use std::collections::HashMap;
 use std::fmt;
 use std::net::{IpAddr, Ipv4Addr};
 
-#[derive(Debug, Deserialize, PartialEq, Clone)]
+#[derive(Debug, Deserialize, PartialEq, Clone, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Arch {
     AARCH64,
@@ -24,7 +24,7 @@ impl fmt::Display for Arch {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields, default)]
 pub struct Base {
     pub arch: Arch,
@@ -147,7 +147,7 @@ impl FromStr for Keymap {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields, default)]
 pub struct Alpine {
     pub mirror: String,
@@ -203,7 +203,7 @@ impl EnvVars for Alpine {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Networking {
     pub dns_nameservers: Vec<IpAddr>,
 }
@@ -236,7 +236,7 @@ impl EnvVars for Networking {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct SSH {
     pub authorized_keys: Vec<PublicKey>,
 }
@@ -261,7 +261,7 @@ impl EnvVars for SSH {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Users {
     pub root_password: String,
     pub remote_user: String,

@@ -1,8 +1,10 @@
+use crate::config::apk_overlay::APKOverlay;
 use anyhow::Result;
-use thiserror::Error;
-
 use gumdrop::Options;
+use std::fs::File;
+use std::io::prelude::*;
 use std::path::{Path, PathBuf};
+use thiserror::Error;
 
 #[derive(Debug, Options)]
 pub struct ConfigOpts {
@@ -15,7 +17,7 @@ pub struct ConfigOpts {
 
 #[derive(Debug, Options)]
 pub enum ConfigCommand {
-    #[options(help = "help generate your config for your apk overlay")]
+    #[options(help = "generate your config for your apk overlay")]
     Gen(GenOpts),
 
     #[options(help = "list all configs in a folder")]
@@ -49,7 +51,12 @@ pub struct GenOpts {
 
 impl GenOpts {
     pub fn run(&self) -> Result<()> {
-        todo!();
+        let overlay = APKOverlay::new();
+
+        let mut file = File::create("config.toml")?;
+        file.write_all(toml::to_string(&overlay).unwrap().as_bytes())?;
+
+        Ok(())
     }
 }
 

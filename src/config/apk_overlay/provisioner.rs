@@ -1,12 +1,12 @@
 use super::env_vars::EnvVars;
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 use thiserror::Error;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EnvironmentVars(pub HashMap<String, String>);
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Provisioner {
     pub name: String,
     pub script_path: String,

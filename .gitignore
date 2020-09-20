@@ -13,3 +13,5 @@ lcov.info
 
 *.tar.gz
 *.env
+
+config.toml

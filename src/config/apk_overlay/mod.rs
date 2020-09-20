@@ -5,13 +5,13 @@ pub mod provisioner;
 use base::Base;
 use env_vars::EnvVars;
 use provisioner::Provisioner;
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::path::Path;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields, default)]
 pub struct APKOverlay {
     pub base: Base,
