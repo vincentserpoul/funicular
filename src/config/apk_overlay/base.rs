@@ -23,6 +23,7 @@ impl fmt::Display for Arch {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields, default)]
 pub struct Base {
     pub arch: Arch,
     pub hostname: String,
@@ -145,6 +146,7 @@ impl FromStr for Keymap {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields, default)]
 pub struct Alpine {
     pub mirror: String,
     pub version: Version,
