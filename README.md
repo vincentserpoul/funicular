@@ -14,6 +14,28 @@ Automate alpine deployment on SBCs (rpi0, rpi2, rpi3, rpi4...).
 We used a narrow concept of [packer provisioners](https://www.packer.io/docs/provisioners/shell-local/), by only allowing a shell-local configuration in order to simplify the configurations.
 Check the test or example folder to check some examples of provisioners.
 
+## Usage
+
+### Download the linux executable from the latest release
+
+(Here)[https://github.com/vincentserpoul/funicular/releases/download/v0.1.0/funicular-linux]
+
+### Generate a default config
+
+```bash
+./funicular config gen
+```
+
+### Build and burn the out example
+
+```bash
+./funicular build -t ./out/example/target -c ./out/example/config.toml -H rpi -d /dev/sda -f true
+```
+
+It will build the example and burn it on /dev/sda for a rpi.
+Next step: insert the card in a rpi and enjoy!
+
 ## Todo
 
+    [ ] add a lot more docs
     [ ] switch from latest-stable to v3.12
