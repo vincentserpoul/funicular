@@ -9,6 +9,11 @@ Automate alpine deployment on SBCs (rpi0, rpi2, rpi3, rpi4...).
 2. Save an immutable local backup (apkovl.tar.gz)
 3. Burn your sdcard and run in memory on your SBC
 
+## Requirements
+
+- Linux (only linux is supported for now)
+- Docker: funicular runs a container buildt by another project, (alpine-diskless-headless)[https://github.com/vincentserpoul/alpine-diskless-headless]
+
 ## Provisioners
 
 We used a narrow concept of [packer provisioners](https://www.packer.io/docs/provisioners/shell-local/), by only allowing a shell-local configuration in order to simplify the configurations.
