@@ -72,3 +72,26 @@ fn provisioners_to_string() {
         );
     });
 }
+
+#[test]
+fn default_conf() {
+    let overlay = APKOverlay::from_path("./tests/config/apk_overlay/configs/default.toml").unwrap();
+    let overlay = overlay.to_string();
+
+    let test_env_vars = [
+        r#"BASE_ARCH="aarch64"#,
+        r#"BASE_ALPINE_MIRROR="http://dl-cdn.alpinelinux.org/alpine"#,
+        r#"BASE_ALPINE_VERSION="3.12.0"#,
+        r#"BASE_ALPINE_TIMEZONE="Asia/Singapore"#,
+        r#"BASE_NETWORKING_DNS_NAMESERVERS="1.1.1.1, 8.8.8.8"#,
+    ];
+
+    test_env_vars.iter().for_each(|s| {
+        assert_eq!(
+            overlay.contains(*s),
+            true,
+            "should contain {}, but did not",
+            *s
+        );
+    });
+}

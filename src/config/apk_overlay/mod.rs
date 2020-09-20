@@ -12,6 +12,7 @@ use std::io;
 use std::path::Path;
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields, default)]
 pub struct APKOverlay {
     pub base: Base,
     pub provisioners: Option<Vec<Provisioner>>,

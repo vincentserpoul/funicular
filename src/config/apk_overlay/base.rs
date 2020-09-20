@@ -1,4 +1,6 @@
 use super::env_vars::EnvVars;
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 use semver::Version;
 use serde_derive::Deserialize;
 use sshkeys::PublicKey;
@@ -37,16 +39,16 @@ impl Default for Base {
     fn default() -> Self {
         Self {
             arch: Arch::AARCH64,
-            hostname: String::from(""),
+            hostname: thread_rng().sample_iter(&Alphanumeric).take(15).collect(),
             alpine: Alpine::default(),
             networking: Networking::default(),
             ssh: SSH {
                 authorized_keys: Vec::new(),
             },
             users: Users {
-                root_password: String::from(""),
-                remote_user: String::from(""),
-                remote_user_password: String::from(""),
+                root_password: thread_rng().sample_iter(&Alphanumeric).take(15).collect(),
+                remote_user: thread_rng().sample_iter(&Alphanumeric).take(15).collect(),
+                remote_user_password: thread_rng().sample_iter(&Alphanumeric).take(15).collect(),
             },
         }
     }
