@@ -4,7 +4,8 @@ use bollard::container::{Config, CreateContainerOptions, LogsOptions, StartConta
 use bollard::models::*;
 use bollard::Docker;
 use futures_util::stream::TryStreamExt;
-use std::path::PathBuf;
+use std::fs;
+use std::path::{Path, PathBuf};
 use tokio::runtime::Runtime;
 
 const DOCKER_APKOVL_BUILD_IMG: &str = "vincentserpoul/funicular:latest";
@@ -17,17 +18,11 @@ pub fn run_build(
     device_path: Option<&PathBuf>,
     force_device_write: Option<bool>,
 ) -> Result<()> {
-    let config_dir_string = config_dir
-        .to_owned()
-        .into_os_string()
-        .into_string()
-        .unwrap();
+    let config_dir_canon = fs::canonicalize(config_dir)?;
+    let config_dir_string = config_dir_canon.into_os_string().into_string().unwrap();
 
-    let target_dir_string = target_dir
-        .to_owned()
-        .into_os_string()
-        .into_string()
-        .unwrap();
+    let target_dir_canon = fs::canonicalize(target_dir)?;
+    let target_dir_string = target_dir_canon.into_os_string().into_string().unwrap();
 
     let mut rt = Runtime::new().unwrap();
     rt.block_on(async {
@@ -40,32 +35,39 @@ pub fn run_build(
             name: DOCKER_APKOVL_CONTAINER_NAME,
         };
 
+        let mut mounts = vec![
+            Mount {
+                source: Some(config_dir_string.clone()),
+                target: Some(String::from("/apk/config")),
+                typ: Some(MountTypeEnum::BIND),
+                consistency: Some(String::from("default")),
+                ..Default::default()
+            },
+            Mount {
+                source: Some(target_dir_string),
+                target: Some(String::from("/target")),
+                typ: Some(MountTypeEnum::BIND),
+                consistency: Some(String::from("default")),
+                ..Default::default()
+            },
+        ];
+
+        let pp = config_dir_string.clone() + "/provisioners";
+        let provisioner_path = Path::new(&pp);
+        if provisioner_path.is_dir() {
+            mounts.push(Mount {
+                source: Some(config_dir_string + "/provisioners"),
+                target: Some(String::from("/apk/additional_provisioners")),
+                typ: Some(MountTypeEnum::BIND),
+                consistency: Some(String::from("default")),
+                ..Default::default()
+            });
+        }
+
         let host_config = HostConfig {
             privileged: Some(true),
             auto_remove: Some(true),
-            mounts: Some(vec![
-                Mount {
-                    source: Some(config_dir_string.clone()),
-                    target: Some(String::from("/apk/config")),
-                    typ: Some(MountTypeEnum::BIND),
-                    consistency: Some(String::from("default")),
-                    ..Default::default()
-                },
-                Mount {
-                    source: Some(config_dir_string + "/provisioners"),
-                    target: Some(String::from("/apk/additional_provisioners")),
-                    typ: Some(MountTypeEnum::BIND),
-                    consistency: Some(String::from("default")),
-                    ..Default::default()
-                },
-                Mount {
-                    source: Some(target_dir_string),
-                    target: Some(String::from("/target")),
-                    typ: Some(MountTypeEnum::BIND),
-                    consistency: Some(String::from("default")),
-                    ..Default::default()
-                },
-            ]),
+            mounts: Some(mounts),
             ..Default::default()
         };
 
