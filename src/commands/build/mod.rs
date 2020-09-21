@@ -24,7 +24,7 @@ pub struct BuildOpts {
     #[options(required, help = "path of your config file")]
     config_file: PathBuf,
 
-    #[options(help = "hardware if you want to create a boot archive: i.e. RPi")]
+    #[options(help = "hardware if you want to create a boot archive: i.e. rpi")]
     hardware: Option<Hardware>,
 
     #[options(help = "device storage path: i.e. /dev/sda")]
