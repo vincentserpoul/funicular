@@ -23,7 +23,7 @@ Check the test or example folder to check some examples of provisioners.
 
 ### Download the linux executable from the latest release
 
-(Here)[https://github.com/vincentserpoul/funicular/releases/download/v0.1.0/funicular-linux]
+(Here)[https://github.com/vincentserpoul/funicular/releases/download/v0.1.3/funicular-linux]
 
 ### Generate a default config
 

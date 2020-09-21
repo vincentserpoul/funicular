@@ -53,7 +53,7 @@ fn provisioners_to_string() {
         r#"BASE_USERS_REMOTE_USER="funi"#,
         r#"BASE_HOSTNAME="with_provisioners"#,
         r#"BASE_ARCH="aarch64"#,
-        r#"BASE_SSH_AUTHORIZED_KEYS="'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMIVp6q5co/r5GwY0dH+NYQbfKicapeF3gXEU3dzaAvD me@home', 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCiChinH9volauTvLfGWv2xCIo0jrQAv0jCQjfDodZW+E1vLFUcgdULKemujxG2vLzLUHfSHF9mjnwnGbyHYZi1fEO70s3gGZNd9K2xwvkGo28svefCfNR3hi+jSB9Q9drvR7CgYdEY5D90Z/OfSWJ4a60/qpD7L3uXf5riqYddDUbHVlDg11SK27KHan33UAfskd5u2AccRbXKJX3I6oO78AwI4/fHs2N/RuoleYcsHX9FNaVX8NHxSEY7EXLTPmykRQj8/8ubjuflvm4qYTsW8cFtRETfxkgFMF0p375YEVQles/6JwRsljnVaobiyeNG1u/5p4zaEguuqN7oVpsP me@home'"#,
+        r#"BASE_SSH_AUTHORIZED_KEYS="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMIVp6q5co/r5GwY0dH+NYQbfKicapeF3gXEU3dzaAvD me@home, ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCiChinH9volauTvLfGWv2xCIo0jrQAv0jCQjfDodZW+E1vLFUcgdULKemujxG2vLzLUHfSHF9mjnwnGbyHYZi1fEO70s3gGZNd9K2xwvkGo28svefCfNR3hi+jSB9Q9drvR7CgYdEY5D90Z/OfSWJ4a60/qpD7L3uXf5riqYddDUbHVlDg11SK27KHan33UAfskd5u2AccRbXKJX3I6oO78AwI4/fHs2N/RuoleYcsHX9FNaVX8NHxSEY7EXLTPmykRQj8/8ubjuflvm4qYTsW8cFtRETfxkgFMF0p375YEVQles/6JwRsljnVaobiyeNG1u/5p4zaEguuqN7oVpsP me@home"#,
         r#"BASE_ALPINE_MIRROR="http://dl-cdn.alpinelinux.org/alpine"#,
         r#"BASE_ALPINE_VERSION="3.12.0"#,
         r#"BASE_ALPINE_TIMEZONE="Asia/Singapore"#,
@@ -67,8 +67,9 @@ fn provisioners_to_string() {
         assert_eq!(
             overlay.contains(*s),
             true,
-            "should contain {}, but did not",
-            *s
+            "should contain {}, but did not\n{}",
+            *s,
+            overlay
         );
     });
 }

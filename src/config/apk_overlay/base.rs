@@ -245,15 +245,12 @@ impl EnvVars for SSH {
     fn to_hash_map(&self, existing_key: &str) -> HashMap<String, String> {
         [(
             existing_key.to_owned() + "_" + "SSH_AUTHORIZED_KEYS",
-            (String::from("'")
-                + self
-                    .authorized_keys
-                    .iter()
-                    .map(|ip| ip.to_string())
-                    .collect::<Vec<String>>()
-                    .join("', '")
-                    .as_str()
-                + "'"),
+            (self
+                .authorized_keys
+                .iter()
+                .map(|ip| ip.to_string())
+                .collect::<Vec<String>>()
+                .join(", ")),
         )]
         .iter()
         .cloned()
