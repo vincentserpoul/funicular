@@ -8,7 +8,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use tokio::runtime::Runtime;
 
-const DOCKER_APKOVL_BUILD_IMG: &str = "vincentserpoul/funicular:latest";
+const DOCKER_APKOVL_BUILD_IMG: &str = "vincentserpoul/funicular:v0.1.0";
 const DOCKER_APKOVL_CONTAINER_NAME: &str = "funicular";
 
 pub fn run_build(
