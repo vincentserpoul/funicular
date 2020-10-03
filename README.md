@@ -12,7 +12,7 @@ Automate alpine deployment on SBCs (rpi0, rpi2, rpi3, rpi4...).
 ## Requirements
 
 - Linux (only linux is supported for now)
-- Docker: funicular runs a container buildt by another project, (alpine-diskless-headless)[https://github.com/vincentserpoul/alpine-diskless-headless]
+- Docker: funicular runs a container buildt by another project, [alpine-diskless-headless](https://github.com/vincentserpoul/alpine-diskless-headless)
 
 ## Provisioners
 
@@ -23,7 +23,7 @@ Check the test or example folder to check some examples of provisioners.
 
 ### Download the linux executable from the latest release
 
-(Here)[https://github.com/vincentserpoul/funicular/releases/download/v0.1.3/funicular-linux]
+[Here](https://github.com/vincentserpoul/funicular/releases/download/v0.1.3/funicular-linux)
 
 ### Generate a default config
 
@@ -44,3 +44,4 @@ Next step: insert the card in a rpi and enjoy!
 
     [ ] add a lot more docs
     [ ] switch from latest-stable to v3.12
+    [ ] publish on crates.io as a binary (see ripgrep as an example)
