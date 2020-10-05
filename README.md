@@ -1,7 +1,7 @@
 # Funicular
 
-![Rust](https://github.com/vincentserpoul/funicular/workflows/Rust/badge.svg?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/vincentserpoul/funicular/badge.svg?branch=master)](https://coveralls.io/github/vincentserpoul/funicular?branch=master)
+![Rust](https://github.com/vincentserpoul/funicular/workflows/Rust/badge.svg?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/vincentserpoul/funicular/badge.svg?branch=main)](https://coveralls.io/github/vincentserpoul/funicular?branch=main)
 
 Automate alpine deployment on SBCs (rpi0, rpi2, rpi3, rpi4...).
 
