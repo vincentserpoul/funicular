@@ -1,8 +1,8 @@
 use super::hardware::Hardware;
-use anyhow::Result;
 use bollard::container::{Config, CreateContainerOptions, LogsOptions, StartContainerOptions};
 use bollard::models::*;
 use bollard::Docker;
+use color_eyre::eyre::Result;
 use futures_util::stream::TryStreamExt;
 use std::fs;
 use std::path::{Path, PathBuf};

@@ -3,9 +3,10 @@ pub mod env_vars;
 pub mod provisioner;
 
 use base::Base;
+use color_eyre::eyre::Result;
 use env_vars::EnvVars;
 use provisioner::Provisioner;
-use serde_derive::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io;
@@ -32,12 +33,12 @@ impl APKOverlay {
         APKOverlay::default()
     }
 
-    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<APKOverlay, anyhow::Error> {
+    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<APKOverlay> {
         let f = File::open(path)?;
         APKOverlay::from_reader(f)
     }
 
-    pub fn from_reader<R: io::Read>(mut rdr: R) -> Result<APKOverlay, anyhow::Error> {
+    pub fn from_reader<R: io::Read>(mut rdr: R) -> Result<APKOverlay> {
         let mut buffer = String::new();
         rdr.read_to_string(&mut buffer)?;
         APKOverlay::from_str(buffer.as_str())
@@ -85,8 +86,8 @@ pub enum ErrorM {
 use std::str::FromStr;
 
 impl FromStr for APKOverlay {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> anyhow::Result<Self> {
+    type Err = color_eyre::eyre::Error;
+    fn from_str(s: &str) -> color_eyre::eyre::Result<Self> {
         let ao: APKOverlay = toml::from_str(s)?;
         Ok(ao)
     }

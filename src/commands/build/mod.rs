@@ -3,7 +3,7 @@ pub mod device;
 use crate::config::apk_overlay::APKOverlay;
 use crate::docker;
 use crate::hardware::Hardware;
-use anyhow::Result;
+use color_eyre::eyre::Result;
 use device::check_path;
 use gumdrop::Options;
 use std::ffi::OsString;

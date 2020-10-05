@@ -4,6 +4,7 @@ pub mod config;
 use build::BuildOpts;
 use config::ConfigOpts;
 
+use color_eyre::eyre::Result;
 use gumdrop::Options;
 
 // Define options for the program.
@@ -17,7 +18,7 @@ pub struct FunicularOpts {
 }
 
 impl FunicularOpts {
-    pub fn run(&self) -> Result<(), anyhow::Error> {
+    pub fn run(&self) -> Result<()> {
         match &self.command {
             Some(FunicularCommand::Config(o)) => o.run(),
             Some(FunicularCommand::Build(o)) => o.run(),

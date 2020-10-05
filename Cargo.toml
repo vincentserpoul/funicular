@@ -13,14 +13,14 @@ categories = ["hardware"]
 [dependencies]
 serde = "1.0"
 toml = "0.5"
-semver = { version = "0.11.0", features = ["serde"] }
+semver = { version = "0.11", features = ["serde"] }
 sshkeys = { version = "0.3", features = ["serde"] }
 serde_derive = "1.0"
-serde_with = "1.5.0"
-thiserror = "1.0.20"
-anyhow = "1.0.32"
+serde_with = "1.5"
+thiserror = "1"
+color-eyre = "0.5"
 gumdrop = "0.8"
 tokio = "0.2"
 bollard = "0.8"
-futures-util = "0.3.5"
-rand = "0.7.3"
+futures-util = "0.3"
+rand = "0.7"

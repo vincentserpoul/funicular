@@ -1,5 +1,5 @@
 use crate::config::apk_overlay::APKOverlay;
-use anyhow::Result;
+use color_eyre::eyre::Result;
 use gumdrop::Options;
 use std::fs::File;
 use std::io::prelude::*;
