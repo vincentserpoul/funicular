@@ -1,5 +1,6 @@
 use super::hardware::Hardware;
 use bollard::container::{Config, CreateContainerOptions, LogsOptions, StartContainerOptions};
+use bollard::image::CreateImageOptions;
 use bollard::models::*;
 use bollard::Docker;
 use color_eyre::eyre::Result;
@@ -7,9 +8,10 @@ use futures_util::stream::TryStreamExt;
 use std::fs;
 use std::path::{Path, PathBuf};
 use tokio::runtime::Runtime;
+use tokio::stream::StreamExt;
 
-const DOCKER_APKOVL_BUILD_IMG: &str = "vincentserpoul/alpine-diskless-headless:v0.1.1";
-const DOCKER_APKOVL_CONTAINER_NAME: &str = "alpine-diskless-headless";
+const ALPINE_DISKLESS_HEADLESS_BUILD_IMG: &str = "vincentserpoul/alpine-diskless-headless:v0.1.3";
+const ALPINE_DISKLESS_HEADLESS_CONTAINER_NAME: &str = "alpine-diskless-headless";
 
 pub fn run_build(
     config_dir: &PathBuf,
@@ -32,7 +34,7 @@ pub fn run_build(
         let docker = Docker::connect_with_named_pipe_defaults().unwrap();
 
         let container_options = CreateContainerOptions {
-            name: DOCKER_APKOVL_CONTAINER_NAME,
+            name: ALPINE_DISKLESS_HEADLESS_CONTAINER_NAME,
         };
 
         let mut mounts = vec![
@@ -89,11 +91,34 @@ pub fn run_build(
         }
 
         let config = Config {
-            image: Some(DOCKER_APKOVL_BUILD_IMG),
+            image: Some(ALPINE_DISKLESS_HEADLESS_BUILD_IMG),
             host_config: Some(host_config),
             cmd: Some(cmd_option.iter().map(AsRef::as_ref).collect()),
             ..Default::default()
         };
+
+        // pull image if needed
+        let mut stream = docker.create_image(
+            Some(CreateImageOptions {
+                from_image: ALPINE_DISKLESS_HEADLESS_BUILD_IMG,
+                ..Default::default()
+            }),
+            None,
+            None,
+        );
+
+        while let Some(v) = stream.next().await {
+            match v {
+                Ok(b) => {
+                    if let Some(status) = b.status {
+                        if let Some(progress) = b.progress {
+                            println!("{} {}", status, progress);
+                        }
+                    }
+                }
+                Err(_e) => (),
+            }
+        }
 
         docker
             .create_container(Some(container_options), config)
@@ -102,7 +127,7 @@ pub fn run_build(
 
         docker
             .start_container(
-                DOCKER_APKOVL_CONTAINER_NAME,
+                ALPINE_DISKLESS_HEADLESS_CONTAINER_NAME,
                 None::<StartContainerOptions<String>>,
             )
             .await
@@ -116,9 +141,9 @@ pub fn run_build(
         });
 
         docker
-            .logs(DOCKER_APKOVL_CONTAINER_NAME, log_options)
-            .map_err(|e| println!("{}", e.to_string()))
-            .map_ok(|x| println!("{}", x.to_string()))
+            .logs(ALPINE_DISKLESS_HEADLESS_CONTAINER_NAME, log_options)
+            .map_err(|e| print!("{}", e.to_string()))
+            .map_ok(|x| print!("{}", x.to_string()))
             .try_collect::<Vec<_>>()
             .await
             .unwrap();

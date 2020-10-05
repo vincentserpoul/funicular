@@ -1,6 +1,6 @@
 [package]
 name = "funicular"
-version = "0.1.2"
+version = "0.1.5"
 authors = ["Vincent Serpoul <vincent@serpoul.com>"]
 edition = "2018"
 description = "Creation of APK overlay for headless, stateless alpine sbc creation"
@@ -17,7 +17,7 @@ semver = { version = "0.11", features = ["serde"] }
 sshkeys = { version = "0.3", features = ["serde"] }
 serde_derive = "1.0"
 serde_with = "1.5"
-thiserror = "1"
+thiserror = "1.0"
 color-eyre = "0.5"
 gumdrop = "0.8"
 tokio = "0.2"
