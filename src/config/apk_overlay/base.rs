@@ -39,16 +39,32 @@ impl Default for Base {
     fn default() -> Self {
         Self {
             arch: Arch::AARCH64,
-            hostname: thread_rng().sample_iter(&Alphanumeric).take(15).collect(),
+            hostname: thread_rng()
+                .sample_iter(&Alphanumeric)
+                .take(15)
+                .map(char::from)
+                .collect(),
             alpine: Alpine::default(),
             networking: Networking::default(),
             ssh: SSH {
                 authorized_keys: Vec::new(),
             },
             users: Users {
-                root_password: thread_rng().sample_iter(&Alphanumeric).take(15).collect(),
-                remote_user: thread_rng().sample_iter(&Alphanumeric).take(15).collect(),
-                remote_user_password: thread_rng().sample_iter(&Alphanumeric).take(15).collect(),
+                root_password: thread_rng()
+                    .sample_iter(&Alphanumeric)
+                    .take(15)
+                    .map(char::from)
+                    .collect(),
+                remote_user: thread_rng()
+                    .sample_iter(&Alphanumeric)
+                    .take(15)
+                    .map(char::from)
+                    .collect(),
+                remote_user_password: thread_rng()
+                    .sample_iter(&Alphanumeric)
+                    .take(15)
+                    .map(char::from)
+                    .collect(),
             },
         }
     }
