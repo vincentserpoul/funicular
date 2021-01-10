@@ -8,9 +8,9 @@ use futures_util::stream::TryStreamExt;
 use std::fs;
 use std::path::{Path, PathBuf};
 use tokio::runtime::Runtime;
-use tokio::stream::StreamExt;
+use tokio_stream::StreamExt;
 
-const ALPINE_DISKLESS_HEADLESS_BUILD_IMG: &str = "vincentserpoul/alpine-diskless-headless:v0.1.3";
+const ALPINE_DISKLESS_HEADLESS_BUILD_IMG: &str = "vincentserpoul/alpine-diskless-headless:v0.1.4";
 const ALPINE_DISKLESS_HEADLESS_CONTAINER_NAME: &str = "alpine-diskless-headless";
 
 pub fn run_build(
@@ -26,7 +26,7 @@ pub fn run_build(
     let target_dir_canon = fs::canonicalize(target_dir)?;
     let target_dir_string = target_dir_canon.into_os_string().into_string().unwrap();
 
-    let mut rt = Runtime::new().unwrap();
+    let rt = Runtime::new().unwrap();
     rt.block_on(async {
         #[cfg(unix)]
         let docker = Docker::connect_with_unix_defaults().unwrap();
